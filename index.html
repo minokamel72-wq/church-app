@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كنيسة السيدة العذراء مريم والشهيد أبانوب بالواسطي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .royal-blue { background-color: #0d1b2a; }
+        .gold-accent { color: #d4af37; }
+        .gold-bg { background-color: #d4af37; }
+        .gold-border { border-color: #d4af37; }
+        
+        body.light-mode { background-color: #f4f6f9; color: #1f2937; }
+        body.light-mode .app-container { background-color: #ffffff; color: #1f2937; }
+        body.light-mode .card-bg { background-color: #f9fafb; color: #1f2937; border-color: #e5e7eb; }
+        
+        body.dark-mode { background-color: #111827; color: #f3f4f6; }
+        body.dark-mode .app-container { background-color: #1f2937; color: #f3f4f6; }
+        body.dark-mode .card-bg { background-color: #374151; color: #f3f4f6; border-color: #4b5563; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .splash-anim { animation: fadeIn 0.8s ease-out forwards; }
+    </style>
+</head>
+<body class="light-mode min-h-screen flex flex-col items-center justify-start p-0 m-0">
+
+    <div id="splashScreen" class="fixed inset-0 royal-blue z-50 flex flex-col items-center justify-center p-4 text-center">
+        <div class="splash-anim flex flex-col items-center">
+            <div class="w-28 h-28 rounded-full border-4 border-amber-400 overflow-hidden shadow-2xl bg-white mb-4 flex items-center justify-center p-1">
+                <img id="splashIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
+            </div>
+            <h1 class="text-xs font-bold gold-accent tracking-wider">إيبارشية بني سويف للأقباط الأرثوذكس</h1>
+            <h2 class="text-base font-black text-white mt-1 mb-6">كنيسة السيدة العذراء والشهيد أبانوب بالواسطي</h2>
+            <div class="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+    </div>
+
+    <div id="authGateScreen" class="fixed inset-0 royal-blue z-40 flex items-center justify-center p-4 overflow-y-auto hidden">
+        <div class="app-container w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border-2 gold-border text-center">
+            <div class="w-20 h-20 rounded-full border-2 border-amber-400 overflow-hidden shadow-md bg-white mx-auto mb-3 flex items-center justify-center p-0.5">
+                <img id="gateIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
+            </div>
+            <h1 class="text-xs font-bold gold-accent">إيبارشية بني سويف للأقباط الأرثوذكس</h1>
+            <h2 class="text-sm font-black text-white mt-1 mb-4">كنيسة السيدة العذراء والشهيد أبانوب بالواسطي</h2>
+            
+            <div id="authOptionsView" class="space-y-3">
+                <p class="text-xs text-gray-300 mb-4">يرجى اختيار نوع تسجيل الدخول للمتابعة:</p>
+                
+                <button id="biometricLoginBtn" onclick="loginWithBiometrics()" class="hidden w-full bg-indigo-900 hover:bg-indigo-950 text-amber-300 font-bold py-2.5 rounded-xl text-xs shadow-lg transition border border-amber-400/50 flex items-center justify-center gap-2">
+                    <span>🧬 الدخول السريع بالبصمة (صباع / وجه)</span>
+                </button>
+
+                <button onclick="showServantLogin()" class="w-full gold-bg hover:bg-amber-600 text-gray-950 font-bold py-3 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
+                    <span>👤 دخول المخدومين والأعضاء</span>
+                </button>
+                <button onclick="showAdminLogin()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 rounded-xl text-xs shadow-lg transition border border-gray-700 flex items-center justify-center gap-2">
+                    <span>⚙️ دخول مسؤولي المراحل والإدارة العامة</span>
+                </button>
+                <div class="pt-3 border-t border-gray-700 space-y-2">
+                    <button onclick="openNewServantModal()" class="text-amber-400 hover:underline text-xs font-bold block w-full">
+                        📝 ليس لديك حساب مخدوم؟ سجل بياناتك الجديدة
+                    </button>
+                    <button onclick="showAdminRegisterModal()" class="text-gray-300 hover:text-white hover:underline text-[11px] block w-full">
+                        ⚙️ تسجيل مسؤول مرحلة أو إداري جديد
+                    </button>
+                </div>
+            </div>
+
+            <div id="servantLoginForm" class="hidden space-y-3 text-right">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-xs font-bold gold-accent">👤 تسجيل دخول مخدوم</h3>
+                    <button onclick="backToAuthOptions()" class="text-[10px] text-gray-400 hover:text-white">رجوع ↩</button>
+                </div>
+                <p class="text-[11px] text-gray-300">أدخل رقم الموبايل المسجل به في الكنيسة:</p>
+                <div>
+                    <label class="block text-xs font-bold mb-1">رقم الموبايل:</label>
+                    <input type="tel" id="loginServantPhone" required placeholder="01xxxxxxxx0" class="w-full p-2.5 border rounded-xl text-xs outline-none bg-transparent">
+                </div>
+                <button onclick="verifyServantLogin()" class="w-full gold-bg hover:bg-amber-600 text-gray-950 font-bold py-2.5 rounded-xl text-xs shadow transition">
+                    دخول التطبيق 🚀
+                </button>
+                <div id="servantLoginError" class="hidden p-2 bg-red-500/20 text-red-400 text-[11px] text-center rounded-xl font-bold"></div>
+            </div>
+
+            <div id="adminLoginForm" class="hidden space-y-3 text-right">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-xs font-bold gold-accent">⚙️ تسجيل دخول مسؤول / إداري</h3>
+                    <button onclick="backToAuthOptions()" class="text-[10px] text-gray-400 hover:text-white">رجوع ↩</button>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">رقم الموبايل المسجل:</label>
+                    <input type="tel" id="loginAdminPhone" required placeholder="01xxxxxxxx0" class="w-full p-2.5 border rounded-xl text-xs outline-none bg-transparent">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">كلمة المرور الخاصة بك:</label>
+                    <input type="password" id="loginAdminPass" required placeholder="كلمة المرور السرية" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                </div>
+                <button onclick="verifyAdminLogin()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
+                    دخول لوحة التحكم 🔐
+                </button>
+                <div id="adminLoginError" class="hidden p-2 bg-red-500/20 text-red-400 text-[11px] text-center rounded-xl font-bold"></div>
+            </div>
+
+            <footer class="mt-6 text-center border-t border-gray-700 pt-3">
+                <p class="text-[10px] text-gray-400">تصميم وإشراف: مينا كامل إبراهيم</p>
+            </footer>
+        </div>
+    </div>
+
+    <div id="mainAppWrapper" class="w-full max-w-md app-container shadow-xl min-h-screen flex flex-col pb-20 hidden">
+        <header class="w-full royal-blue text-white shadow-md p-3 flex items-center justify-between sticky top-0 z-40">
+            <div class="flex items-center space-x-2.5 space-x-reverse">
+                <div class="w-11 h-11 rounded-full border-2 border-amber-400 overflow-hidden shadow-md bg-white flex-shrink-0">
+                    <img id="headerIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h1 class="text-[11px] font-bold gold-accent">كنيسة السيدة العذراء بالواسطي</h1>
+                    <h2 id="currentUserBadge" class="text-[10px] text-gray-200">مرحباً بك</h2>
+                </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <button onclick="toggleTheme()" id="themeToggleBtn" class="bg-gray-700 hover:bg-gray-800 text-white text-[10px] px-2 py-1.5 rounded-xl font-bold shadow">🌙</button>
+                <button onclick="logoutApp()" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2.5 py-1.5 rounded-xl font-bold shadow">خروج 🚪</button>
+            </div>
+        </header>
+
+        <main class="flex-1 flex flex-col">
+            <div class="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center flex justify-between items-center">
+                <p id="liveDateContainer" class="text-xs font-bold gold-accent">جارِ تحديث التاريخ...</p>
+                <button onclick="openAdminSettings()" id="adminSettingsBtn" class="hidden bg-amber-600 text-white px-2 py-1 rounded-lg text-[10px] font-bold shadow">⚙️ إدارة النظام الشاملة</button>
+            </div>
+
+            <div class="p-6 bg-gradient-to-b from-blue-950 via-indigo-950 to-blue-900 text-white text-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="relative z-10 flex flex-col items-center">
+                    <div class="w-28 h-28 rounded-full border-4 border-amber-400 shadow-2xl overflow-hidden mb-3 bg-white flex items-center justify-center p-0.5">
+                        <img id="heroIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
+                    </div>
+                    <h3 class="text-base font-bold text-amber-300">أهلاً بكم في تطبيق الكنيسة</h3>
+                    <p class="text-xs text-gray-300 mt-1">تواصل مستمر، خدمات روحية، وحجز فعاليات فوري</p>
+                </div>
+            </div>
+
+            <div class="px-4 pt-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="font-bold text-xs gold-accent">🏷️ تصفية المحتوى حسب المرحلة:</h4>
+                </div>
+                <div id="stagesBar" class="flex gap-1.5 overflow-x-auto pb-2 scrollbar-none"></div>
+            </div>
+
+            <div class="p-4 grid grid-cols-4 gap-2 text-center">
+                <div onclick="openAgendaModal()" class="card-bg border p-2.5 rounded-xl shadow-sm transition cursor-pointer hover:border-amber-500">
+                    <span class="text-xl">📅</span>
+                    <p class="text-[11px] font-bold mt-1">الأجندة</p>
+                </div>
+                <div onclick="openNotificationsModal()" class="card-bg border p-2.5 rounded-xl shadow-sm transition cursor-pointer hover:border-amber-500">
+                    <span class="text-xl">🔔</span>
+                    <p class="text-[11px] font-bold mt-1">التنبيهات</p>
+                </div>
+                <div onclick="openConfessionModal()" class="card-bg border p-2.5 rounded-xl shadow-sm transition cursor-pointer hover:border-amber-500">
+                    <span class="text-xl">🙏</span>
+                    <p class="text-[11px] font-bold mt-1">اعتراف</p>
+                </div>
+                <div onclick="openSuggestionModal()" class="card-bg border p-2.5 rounded-xl shadow-sm transition cursor-pointer hover:border-amber-500">
+                    <span class="text-xl">💡</span>
+                    <p class="text-[11px] font-bold mt-1">اقتراحات</p>
+                </div>
+            </div>
+
+            <div class="px-4 py-2">
+                <div id="stageContentContainer" class="border-2 gold-border rounded-2xl p-4 card-bg shadow-md"></div>
+            </div>
+
+            <div class="px-4 py-2">
+                <div class="card-bg border rounded-2xl p-4 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-xs gold-accent flex items-center gap-1"><span>📊</span> استبيانات واستطلاعات رأي المرحلة:</h4>
+                        <button onclick="openCreatePollModal()" id="createPollBtn" class="hidden bg-amber-600 text-white text-[10px] px-2 py-1 rounded font-bold shadow">+ إنشاء استبيان</button>
+                    </div>
+                    <div id="stagePollsContainer" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <div class="px-4 py-2">
+                <div class="card-bg border rounded-2xl p-4 shadow-sm">
+                    <h4 class="font-bold text-xs gold-accent mb-2 flex items-center gap-1"><span>📢</span> إعلانات وتنبيهات القطاع:</h4>
+                    <div id="stageAnnouncementsContainer" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <div id="librarySection" class="px-4 py-3">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="font-bold text-sm flex items-center gap-1 gold-accent"><span>📚</span> مكتبة الروحيات والعظات</h4>
+                </div>
+                <div id="libraryContainer" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+            </div>
+
+            <div class="px-4 py-2 grid grid-cols-2 gap-3 mb-6">
+                <div onclick="openMassesModal()" class="p-3 border rounded-xl flex items-center space-x-3 space-x-reverse card-bg cursor-pointer hover:border-amber-500 transition">
+                    <span class="text-2xl">⛪</span>
+                    <div>
+                        <h5 class="text-xs font-bold">القداسات</h5>
+                        <p class="text-[10px] opacity-60">مواعيد الأسرار</p>
+                    </div>
+                </div>
+                <div onclick="openSermonsModal()" class="p-3 border rounded-xl flex items-center space-x-3 space-x-reverse card-bg cursor-pointer hover:border-amber-500 transition">
+                    <span class="text-2xl">🎧</span>
+                    <div>
+                        <h5 class="text-xs font-bold">العظات الصوتية</h5>
+                        <p class="text-[10px] opacity-60">مكتبة الصوتيات</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="mt-auto py-4 text-center border-t card-bg">
+            <p class="text-xs font-bold gold-accent">تم التصميم بواسطة: مينا كامل إبراهيم</p>
+        </footer>
+    </div>
+
+    <div id="adminRegisterModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="app-container w-full max-w-sm rounded-2xl p-5 shadow-2xl relative border max-h-[95vh] overflow-y-auto">
+            <button onclick="closeAdminRegisterModal()" class="absolute left-4 top-4 opacity-50 hover:opacity-100 font-bold text-lg">✕</button>
+            <h3 class="text-base font-bold gold-accent mb-1">⚙️ تسجيل مسؤول أو إداري جديد</h3>
+            <form id="adminRegForm" onsubmit="submitNewAdminRegister(event)" class="space-y-3 mt-2">
+                <div>
+                    <label class="block text-xs font-bold mb-1">اسم المسؤول:</label>
+                    <input type="text" id="regAdminName" required placeholder="مثلاً: مينا كامل" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">نوع الصلاحية:</label>
+                    <select id="regAdminType" onchange="onAdminTypeChange()" required class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                        <option class="text-black" value="stage_admin">مسؤول مرحلة معينة فقط</option>
+                        <option class="text-black" value="super_admin">مسؤول عام شامل (لكل المراحل)</option>
+                    </select>
+                </div>
+                <div id="regStageBox">
+                    <label class="block text-xs font-bold mb-1">المرحلة المسؤولة عنها:</label>
+                    <select id="regAdminStageSelect" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">رقم الموبايل:</label>
+                    <input type="tel" id="regAdminPhone" required placeholder="01xxxxxxxx0" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">كلمة المرور:</label>
+                    <input type="password" id="regAdminPass" required placeholder="كلمة سر للدخول" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                </div>
+                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">حفظ الحساب الإداري 🚀</button>
+            </form>
+            <div id="adminRegSuccessMsg" class="hidden mt-3 p-3 bg-green-500/20 text-green-400 text-xs text-center rounded-xl font-bold">تم حفظ بياناتك الإدارية بنجاح!</div>
+        </div>
+    </div>
+
+    <div id="createPollModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="app-container w-full max-w-sm rounded-2xl p-5 shadow-2xl relative border">
+            <button onclick="closeCreatePollModal()" class="absolute left-4 top-4 font-bold">✕</button>
+            <h3 class="text-base font-bold gold-accent mb-2">📊 إنشاء استبيان جديد</h3>
+            <form onsubmit="submitNewPoll(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold mb-1">المرحلة المستهدفة:</label>
+                    <select id="pollTargetStage" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">سؤال الاستبيان:</label>
+                    <input type="text" id="pollQuestion" required placeholder="مثلاً: ما رأيك في موعد الرحلة القادمة؟" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">الخيارات (افصل بينها بفاصلة ,):</label>
+                    <input type="text" id="pollOptions" required placeholder="الخميس, الجمعة, السبت" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                </div>
+                <button type="submit" class="w-full bg-amber-600 text-white font-bold py-2.5 rounded-xl text-xs shadow">نشر الاستبيان 🚀</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="newServantModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="app-container w-full max-w-sm rounded-2xl p-5 shadow-2xl relative border max-h-[95vh] overflow-y-auto">
+            <button onclick="closeNewServantModal()" class="absolute left-4 top-4 opacity-50 hover:opacity-100 font-bold text-lg">✕</button>
+            <h3 class="text-base font-bold gold-accent mb-1">📝 تسجيل بيانات مخدوم جديد</h3>
+            <form id="servantForm" onsubmit="submitNewServant(event)" class="space-y-3 mt-2">
+                <div>
+                    <label class="block text-xs font-bold mb-1">الاسم الثلاثي:</label>
+                    <input type="text" id="servantName" required placeholder="أدخل اسمك الكامل" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">تاريخ الميلاد:</label>
+                    <input type="date" id="servantDob" required class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">رقم الموبايل:</label>
+                    <input type="tel" id="servantPhone" required placeholder="01xxxxxxxx0" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold">العنوان أو اللوكيشن:</label>
+                        <button type="button" onclick="getLocationGPS()" class="text-[10px] text-amber-500 font-bold underline">📍 تحديد موقعي</button>
+                    </div>
+                    <input type="text" id="servantAddress" required placeholder="اكتب العنوان بالتفصيل" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">المرحلة التعليمية العامة:</label>
+                    <select id="servantGeneralStage" onchange="onGeneralStageChange()" required class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                        <option class="text-black" value="">-- اختر المرحلة --</option>
+                        <option class="text-black" value="حضانة">حضانة</option>
+                        <option class="text-black" value="ابتدائي">ابتدائي</option>
+                        <option class="text-black" value="إعدادي">إعدادي</option>
+                        <option class="text-black" value="ثانوي">ثانوي</option>
+                        <option class="text-black" value="جامعة">جامعة</option>
+                    </select>
+                </div>
+                <div id="subGradeContainer" class="hidden space-y-3 p-3 rounded-xl border card-bg">
+                    <div id="schoolGradeBox" class="hidden">
+                        <label class="block text-xs font-bold mb-1">الصف الدراسي:</label>
+                        <select id="servantSchoolGrade" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent"></select>
+                    </div>
+                    <div id="universityBox" class="hidden space-y-2">
+                        <div>
+                            <label class="block text-xs font-bold mb-1">اسم الكلية:</label>
+                            <input type="text" id="servantCollegeName" placeholder="الكلية" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1">الفرقة:</label>
+                            <select id="servantUniYear" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                                <option class="text-black" value="فرقة أولى">فرقة أولى</option>
+                                <option class="text-black" value="فرقة ثانية">فرقة ثانية</option>
+                                <option class="text-black" value="فرقة ثالثة">فرقة ثالثة</option>
+                                <option class="text-black" value="فرقة رابعة">فرقة رابعة</option>
+                                <option class="text-black" value="خريج">خريج</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="w-full royal-blue text-white font-bold py-2.5 rounded-xl text-xs shadow">إرسال لمسؤول المرحلة 🚀</button>
+            </form>
+            <div id="servantSuccessMsg" class="hidden mt-3 p-3 bg-green-500/20 text-green-400 text-xs text-center rounded-xl font-bold">تم إرسال طلب انضمامك بنجاح!</div>
+        </div>
+    </div>
+
+    <div id="adminModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
+        <div class="app-container w-full max-w-sm rounded-2xl p-5 shadow-2xl relative max-h-[90vh] overflow-y-auto border">
+            <button onclick="closeAdminSettings()" class="absolute left-4 top-4 opacity-50 hover:opacity-100 font-bold text-lg">✕</button>
+            <h3 class="text-base font-bold gold-accent mb-1">لوحة إدارة النظام الشاملة 🔐</h3>
+            
+            <div class="mb-4 p-3 rounded-xl border card-bg">
+                <h4 class="text-xs font-bold gold-accent mb-2">🖼️ تعديل ورفع صورة الكنيسة:</h4>
+                <div class="space-y-2">
+                    <input type="text" id="churchImageUrlInput" placeholder="أدخل رابط الصورة (URL) مباشر" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                    <div class="text-center text-[10px] opacity-60">أو رفع صورة من الجهاز:</div>
+                    <input type="file" id="churchImageFileInput" accept="image/*" onchange="handleImageUpload(event)" class="w-full p-1 border rounded-xl text-[10px] bg-transparent">
+                    <button onclick="updateChurchImage()" class="w-full bg-amber-600 text-white font-bold py-2 rounded-xl text-xs shadow">تحديث وصفظ الصورة</button>
+                </div>
+            </div>
+
+            <div class="mb-4 p-3 rounded-xl border card-bg">
+                <h4 class="text-xs font-bold gold-accent mb-2">⏳ طلبات الانضمام المعلقة:</h4>
+                <div id="pendingRequestsContainer" class="space-y-2 max-h-40 overflow-y-auto text-xs"></div>
+            </div>
+
+            <div class="mb-4 p-3 rounded-xl border card-bg">
+                <h4 class="text-xs font-bold gold-accent mb-2">📢 نشر إعلان لقطاع:</h4>
+                <div class="space-y-2 mb-3">
+                    <select id="announcementTargetStage" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent"></select>
+                    <input type="text" id="announcementTitle" placeholder="عنوان الإعلان" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                    <textarea id="announcementText" placeholder="التفاصيل..." rows="2" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent resize-none"></textarea>
+                    <button onclick="publishTargetedAnnouncement()" class="w-full bg-amber-600 text-white font-bold py-2 rounded-xl text-xs shadow">نشر الإعلان</button>
+                </div>
+            </div>
+
+            <div class="mb-4 p-3 rounded-xl border card-bg">
+                <h4 class="text-xs font-bold gold-accent mb-2">📊 سجل المخدومين:</h4>
+                <div id="servantsListContainer" class="space-y-2 max-h-32 overflow-y-auto text-xs"></div>
+            </div>
+
+            <div class="mb-4 p-3 rounded-xl border card-bg">
+                <h4 class="text-xs font-bold gold-accent mb-2">🏷️ إدارة المراحل:</h4>
+                <div class="space-y-2 mb-3">
+                    <input type="text" id="newStageName" placeholder="اسم المرحلة" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                    <input type="text" id="newStageAdminName" placeholder="اسم الخادم المسؤول" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                    <input type="tel" id="newStageAdminPhone" placeholder="رقم واتساب الخادم" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
+                    <button onclick="addNewStage()" class="w-full bg-amber-600 text-white font-bold py-2 rounded-xl text-xs shadow">إضافة المرحلة</button>
+                </div>
+                <div id="adminStagesList" class="space-y-1 max-h-24 overflow-y-auto text-xs"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="suggestionModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"><div class="app-container w-full max-w-sm rounded-2xl p-5 shadow-2xl relative border"><button onclick="closeSuggestionModal()" class="absolute left-4 top-4 font-bold">✕</button><h3 class="text-base font-bold gold-accent mb-1">💡 اقتراح</h3><form id="suggestionForm" onsubmit="submitSuggestion(event)" class="space-y-3 mt-3"><div><select id="suggestionStage" required class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent"></select></div><div><textarea id="suggestionText" required rows="3" placeholder="اكتب مقترحك..." class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent resize-none"></textarea></div><button type="submit" class="w-full royal-blue text-white font-bold py-2.5 rounded-xl text-xs shadow">إرسال</button></form></div></div>
+    <div id="regModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"><div class="app-container w-full max-w-sm rounded-2xl p-5 shadow-2xl relative border"><button onclick="closeModal()" class="absolute left-4 top-4 font-bold">✕</button><h3 class="text-base font-bold gold-accent mb-1">حجز فعالية</h3><form id="bookingForm" onsubmit="submitForm(event)" class="space-y-3 mt-3"><select id="userGroup" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent"></select><button type="submit" class="w-full royal-blue text-white font-bold py-2.5 rounded-xl text-xs shadow">إرسال</button></form></div></div>
+    <div id="confessionModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"><div class="app-container w-full max-w-sm rounded-2xl p-5 shadow-2xl relative border"><button onclick="closeConfessionModal()" class="absolute left-4 top-4 font-bold">✕</button><h3 class="text-base font-bold gold-accent mb-1">سر الاعتراف</h3><form id="confessionForm" onsubmit="submitConfession(event)" class="space-y-3 mt-3"><select id="confStage" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent"></select><button type="submit" class="w-full royal-blue text-white font-bold py-2.5 rounded-xl text-xs shadow">حجز</button></form></div></div>
+    <div id="agendaModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"><div class="app-container w-full max-w-sm rounded-2xl p-5 shadow-2xl relative border"><button onclick="closeAgendaModal()" class="absolute left-4 top-4 font-bold">✕</button><h3 class="text-base font-bold gold-accent mb-2">📅 الأجندة</h3><div class="card-bg p-3 rounded-xl border text-xs"><p class="font-bold text-amber-500">قداس الأحد الإسبوعي</p></div></div></div>
+    <div id="notificationsModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"><div class="app-container w-full max-w-sm rounded-2xl p-5 shadow-2xl relative border"><button onclick="closeNotificationsModal()" class="absolute left-4 top-4 font-bold">✕</button><h3 class="text-base font-bold gold-accent mb-2">🔔 التنبيهات</h3><div class="card-bg p-3 rounded-xl border text-xs"><p class="font-bold text-amber-500">النظام آمن ومحدث</p></div></div></div>
+    <div id="massesModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"><div class="app-container w-full max-w-sm rounded-2xl p-5 shadow-2xl relative border"><button onclick="closeMassesModal()" class="absolute left-4 top-4 font-bold">✕</button><h3 class="text-base font-bold gold-accent mb-2">⛪ القداسات</h3><div class="card-bg p-3 rounded-xl border text-xs"><p class="font-bold text-amber-500">الأحد والأربعاء 6 صباحاً</p></div></div></div>
+    <div id="sermonsModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4"><div class="app-container w-full max-w-sm rounded-2xl p-5 shadow-2xl relative border"><button onclick="closeSermonsModal()" class="absolute left-4 top-4 font-bold">✕</button><h3 class="text-base font-bold gold-accent mb-2">🎧 العظات</h3><div class="card-bg p-3 rounded-xl border text-xs"><p class="font-bold text-amber-500">مكتبة الصوتيات</p></div></div></div>
+
+    <script>
+        let currentLoggedInUser = null; 
+        const MASTER_ADMIN_PHONE = "01204375306"; // رقم المسؤول الأساسي المعتمد
+
+        function getChurchImage() {
+            return localStorage.getItem('church_app_image') || 'https://i.ibb.co/6y402v7/1000080640.jpg';
+        }
+
+        // رفع وتعديل الصور من الجهاز أو رابط
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('churchImageUrlInput').value = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateChurchImage() {
+            const url = document.getElementById('churchImageUrlInput').value.trim();
+            if (!url) { alert('أدخل رابط الصورة أو اختر صورة من جهازك.'); return; }
+            localStorage.setItem('church_app_image', url);
+            applyChurchImage();
+            alert('تم تحديث وتعديل صورة الكنيسة بنجاح!');
+        }
+
+        function applyChurchImage() {
+            const imgUrl = getChurchImage();
+            ['splashIcon', 'gateIcon', 'headerIcon', 'heroIcon'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.src = imgUrl;
+            });
+        }
+
+        function getStagesData() {
+            let stages = JSON.parse(localStorage.getItem('church_stages_data'));
+            if (!stages || stages.length === 0) {
+                stages = [
+                    { id: 'family', name: 'اجتماع الأسرة', adminName: 'خادم الاجتماع', adminPhone: '201000000000', activity: 'لقاء روحي أسبوعي' },
+                    { id: 'uni', name: 'شباب جامعة وخريجين', adminName: 'خادم الجامعة', adminPhone: '201000000000', activity: 'رحلة خلوية' },
+                    { id: 'sec', name: 'المرحلة الثانوية', adminName: 'خادم الثانوي', adminPhone: '201000000000', activity: 'مسابقات الإنجيل' },
+                    { id: 'prep', name: 'المرحلة الإعدادية', adminName: 'خادم الإعدادي', adminPhone: '201000000000', activity: 'رحلة ترفيهية' },
+                    { id: 'prim', name: 'مدارس الأحد والابتدائي', adminName: 'خادم الابتدائي', adminPhone: '201000000000', activity: 'حفل أطفال' },
+                    { id: 'kg', name: 'قطاع الحضانة', adminName: 'خادم الحضانة', adminPhone: '201000000000', activity: 'أنشطة تلوين' }
+                ];
+                localStorage.setItem('church_stages_data', JSON.stringify(stages));
+            }
+            return stages;
+        }
+
+        let currentSelectedStageId = 'family';
+
+        function getAdminsList() {
+            let admins = JSON.parse(localStorage.getItem('church_registered_admins') || '[]');
+            if(!admins.some(a => a.phone === MASTER_ADMIN_PHONE)) {
+                admins.push({ name: 'المسؤول العام (مينا كامل)', type: 'super_admin', stage: 'الإدارة العليا والشاملة', phone: MASTER_ADMIN_PHONE, pass: '123456' });
+                localStorage.setItem('church_registered_admins', JSON.stringify(admins));
+            }
+            return admins;
+        }
+
+        function showAdminRegisterModal() { 
+            populateDropdowns();
+            document.getElementById('adminRegisterModal').classList.remove('hidden'); 
+        }
+        function closeAdminRegisterModal() { document.getElementById('adminRegisterModal').classList.add('hidden'); }
+
+        function onAdminTypeChange() {
+            const type = document.getElementById('regAdminType').value;
+            const stageBox = document.getElementById('regStageBox');
+            if (type === 'super_admin') {
+                stageBox.classList.add('hidden');
+            } else {
+                stageBox.classList.remove('hidden');
+            }
+        }
+
+        function submitNewAdminRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regAdminName').value.trim();
+            const type = document.getElementById('regAdminType').value;
+            const stage = type === 'super_admin' ? 'الإدارة العليا والشاملة' : document.getElementById('regAdminStageSelect').value;
+            const phone = document.getElementById('regAdminPhone').value.trim();
+            const pass = document.getElementById('regAdminPass').value.trim();
+
+            let admins = getAdminsList();
+            if(admins.some(a => a.phone === phone)) { alert('رقم الموبايل مسجل مسبقاً!'); return; }
+
+            admins.push({ name, type, stage, phone, pass });
+            localStorage.setItem('church_registered_admins', JSON.stringify(admins));
+            
+            document.getElementById('adminRegForm').style.display = 'none';
+            document.getElementById('adminRegSuccessMsg').classList.remove('hidden');
+            setTimeout(() => {
+                closeAdminRegisterModal();
+                document.getElementById('adminRegForm').reset();
+                document.getElementById('adminRegForm').style.display = 'block';
+                document.getElementById('adminRegSuccessMsg').classList.add('hidden');
+            }, 2000);
+        }
+
+        function showServantLogin() {
+            document.getElementById('authOptionsView').classList.add('hidden');
+            document.getElementById('servantLoginForm').classList.remove('hidden');
+            document.getElementById('adminLoginForm').classList.add('hidden');
+        }
+
+        function showAdminLogin() {
+            document.getElementById('authOptionsView').classList.add('hidden');
+            document.getElementById('servantLoginForm').classList.add('hidden');
+            document.getElementById('adminLoginForm').classList.remove('hidden');
+        }
+
+        function backToAuthOptions() {
+            document.getElementById('authOptionsView').classList.remove('hidden');
+            document.getElementById('servantLoginForm').classList.add('hidden');
+            document.getElementById('adminLoginForm').classList.add('hidden');
+            document.getElementById('servantLoginError').classList.add('hidden');
+            document.getElementById('adminLoginError').classList.add('hidden');
+        }
+
+        function verifyServantLogin() {
+            const phone = document.getElementById('loginServantPhone').value.trim();
+            const errorDiv = document.getElementById('servantLoginError');
+            if (!phone) { errorDiv.innerText = 'أدخل رقم الموبايل.'; errorDiv.classList.remove('hidden'); return; }
+
+            if (phone === MASTER_ADMIN_PHONE) {
+                currentLoggedInUser = { type: 'admin', adminRole: 'super_admin', name: 'المسؤول العام الرئيسي', phone: MASTER_ADMIN_PHONE, stage: 'الإدارة العليا' };
+                localStorage.setItem('church_logged_in_user', JSON.stringify(currentLoggedInUser));
+                localStorage.setItem('church_biometric_user', JSON.stringify(currentLoggedInUser));
+                enterApp();
+                return;
+            }
+
+            let servants = JSON.parse(localStorage.getItem('church_all_servants') || '[]');
+            let found = servants.find(s => s.phone === phone);
+
+            if (found) {
+                currentLoggedInUser = { type: 'servant', name: found.name, phone: found.phone, stage: found.generalStage };
+                localStorage.setItem('church_logged_in_user', JSON.stringify(currentLoggedInUser));
+                localStorage.setItem('church_biometric_user', JSON.stringify(currentLoggedInUser));
+                enterApp();
+            } else {
+                errorDiv.innerText = 'رقم غير مسجل أو لم يوافق عليه المسؤول بعد.';
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function verifyAdminLogin() {
+            const phone = document.getElementById('loginAdminPhone').value.trim();
+            const pass = document.getElementById('loginAdminPass').value.trim();
+            const errorDiv = document.getElementById('adminLoginError');
+
+            if (phone === MASTER_ADMIN_PHONE) {
+                currentLoggedInUser = { type: 'admin', adminRole: 'super_admin', name: 'المسؤول العام الرئيسي', phone: MASTER_ADMIN_PHONE, stage: 'الإدارة العليا' };
+                localStorage.setItem('church_logged_in_user', JSON.stringify(currentLoggedInUser));
+                localStorage.setItem('church_biometric_user', JSON.stringify(currentLoggedInUser));
+                enterApp();
+                return;
+            }
+
+            let admins = getAdminsList();
+            let matchedAdmin = admins.find(a => a.phone === phone && a.pass === pass);
+
+            if (matchedAdmin) {
+                currentLoggedInUser = { 
+                    type: 'admin', 
+                    adminRole: matchedAdmin.type || 'stage_admin', 
+                    name: matchedAdmin.name, 
+                    phone: matchedAdmin.phone, 
+                    stage: matchedAdmin.stage 
+                };
+                localStorage.setItem('church_logged_in_user', JSON.stringify(currentLoggedInUser));
+                localStorage.setItem('church_biometric_user', JSON.stringify(currentLoggedInUser));
+                enterApp();
+            } else {
+                errorDiv.innerText = 'رقم الموبايل أو كلمة المرور غير صحيحة!';
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        async function loginWithBiometrics() {
+            const savedBioUser = localStorage.getItem('church_biometric_user');
+            if(!savedBioUser) { alert('لا توجد بصمة محفوظة.'); return; }
+            try {
+                if (window.PublicKeyCredential && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+                    await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                }
+                currentLoggedInUser = JSON.parse(savedBioUser);
+                localStorage.setItem('church_logged_in_user', JSON.stringify(currentLoggedInUser));
+                enterApp();
+            } catch (err) {
+                currentLoggedInUser = JSON.parse(savedBioUser);
+                localStorage.setItem('church_logged_in_user', JSON.stringify(currentLoggedInUser));
+                enterApp();
+            }
+        }
+
+        function checkBiometricAvailability() {
+            const btn = document.getElementById('biometricLoginBtn');
+            if(localStorage.getItem('church_biometric_user') && btn) btn.classList.remove('hidden');
+        }
+
+        function enterApp() {
+            document.getElementById('authGateScreen').classList.add('hidden');
+            document.getElementById('mainAppWrapper').classList.remove('hidden');
+            
+            if (currentLoggedInUser.type === 'admin') {
+                if (currentLoggedInUser.adminRole === 'super_admin') {
+                    document.getElementById('currentUserBadge').innerText = `المسؤول العام الشامل: ${currentLoggedInUser.name}`;
+                    document.getElementById('adminSettingsBtn').classList.remove('hidden');
+                    document.getElementById('createPollBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('currentUserBadge').innerText = `مسؤول مرحلة (${currentLoggedInUser.stage}): ${currentLoggedInUser.name}`;
+                    document.getElementById('adminSettingsBtn').classList.add('hidden'); // إخفاء الإدارة الشاملة لمسؤول المرحلة المخصص
+                    document.getElementById('createPollBtn').classList.remove('hidden');
+                    // تثبيت عرض شريط المراحل على مرحلته الخاصة فقط أو السماح له بإنشاء استبيانات لمرحلته
+                }
+            } else {
+                document.getElementById('currentUserBadge').innerText = `مرحباً بك يا ${currentLoggedInUser.name} (${currentLoggedInUser.stage})`;
+                document.getElementById('adminSettingsBtn').classList.add('hidden');
+                document.getElementById('createPollBtn').classList.add('hidden');
+            }
+            renderStagesBar();
+            renderLibrary();
+        }
+
+        function logoutApp() {
+            localStorage.removeItem('church_logged_in_user');
+            currentLoggedInUser = null;
+            document.getElementById('mainAppWrapper').classList.add('hidden');
+            document.getElementById('authGateScreen').classList.remove('hidden');
+            backToAuthOptions();
+            checkBiometricAvailability();
+        }
+
+        function renderStagesBar() {
+            const stages = getStagesData();
+            const bar = document.getElementById('stagesBar');
+            bar.innerHTML = '';
+            stages.forEach(stage => {
+                const isActive = stage.id === currentSelectedStageId;
+                bar.innerHTML += `
+                    <button onclick="selectStage('${stage.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition border ${isActive ? 'bg-amber-600 text-white border-amber-600 shadow' : 'card-bg opacity-80'}">
+                        ${stage.name}
+                    </button>
+                `;
+            });
+            renderStageContent();
+            renderStageAnnouncements();
+            renderStagePolls();
+            populateDropdowns();
+        }
+
+        function selectStage(id) { currentSelectedStageId = id; renderStagesBar(); }
+
+        function renderStageContent() {
+            const stages = getStagesData();
+            const current = stages.find(s => s.id === currentSelectedStageId);
+            const container = document.getElementById('stageContentContainer');
+            if (!current) return;
+            container.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <span class="bg-amber-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">نشاط: ${current.name}</span>
+                    <span class="text-[10px] opacity-75">المسؤول: ${current.adminName}</span>
+                </div>
+                <h4 class="font-bold text-sm mb-1">${current.activity}</h4>
+                <button onclick="openModal()" class="w-full gold-bg hover:bg-amber-600 text-gray-950 font-bold py-2 rounded-xl text-xs shadow mt-2">✨ حجز في نشاط ${current.name}</button>
+            `;
+        }
+
+        // دوام إدارة الاستبيانات (Polls) لكل مرحلة
+        function getPollsData() {
+            return JSON.parse(localStorage.getItem('church_stage_polls')) || [
+                { id: 'p1', stageId: 'family', question: 'هل تفضل حضور الاجتماع يوم السبت أم الأحد؟', options: ['السبت', 'الأحد'], votes: { 'السبت': 5, 'الأحد': 12 } }
+            ];
+        }
+
+        function openCreatePollModal() { document.getElementById('createPollModal').classList.remove('hidden'); }
+        function closeCreatePollModal() { document.getElementById('createPollModal').classList.add('hidden'); }
+
+        function submitNewPoll(e) {
+            e.preventDefault();
+            const stageId = document.getElementById('pollTargetStage').value;
+            const question = document.getElementById('pollQuestion').value.trim();
+            const optsInput = document.getElementById('pollOptions').value.trim();
+            const options = optsInput.split(',').map(o => o.trim()).filter(o => o);
+
+            if(options.length < 2) { alert('أدخل خيارين على الأقل مفصولين بفاصلة (,).'); return; }
+
+            let polls = getPollsData();
+            let votesObj = {};
+            options.forEach(opt => votesObj[opt] = 0);
+
+            polls.push({ id: 'poll_' + Date.now(), stageId, question, options, votes: votesObj });
+            localStorage.setItem('church_stage_polls', JSON.stringify(polls));
+            closeCreatePollModal();
+            renderStagePolls();
+            alert('تم نشر الاستبيان بنجاح في المرحلة!');
+        }
+
+        function votePoll(pollId, option) {
+            let polls = getPollsData();
+            let poll = polls.find(p => p.id === pollId);
+            if(poll) {
+                poll.votes[option] = (poll.votes[option] || 0) + 1;
+                localStorage.setItem('church_stage_polls', JSON.stringify(polls));
+                renderStagePolls();
+                alert('تم تسجيل صوتك بنجاح!');
+            }
+        }
+
+        function renderStagePolls() {
+            const container = document.getElementById('stagePollsContainer');
+            let polls = getPollsData().filter(p => p.stageId === currentSelectedStageId);
+            container.innerHTML = polls.length === 0 ? `<p class="text-[11px] opacity-60 text-center py-2">لا توجد استبيانات نشطة لهذه المرحلة.</p>` : '';
+            
+            polls.forEach(poll => {
+                let totalVotes = Object.values(poll.votes).reduce((a, b) => a + b, 0);
+                let optionsHtml = '';
+                poll.options.forEach(opt => {
+                    let count = poll.votes[opt] || 0;
+                    let percent = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+                    optionsHtml += `
+                        <div class="mb-2">
+                            <div class="flex justify-between text-[11px] font-bold mb-1">
+                                <button onclick="votePoll('${poll.id}', '${opt}')" class="text-amber-500 hover:underline">🔹 ${opt}</button>
+                                <span>${count} صوت (${percent}%)</span>
+                            </div>
+                            <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
+                                <div class="bg-amber-500 h-full" style="width: ${percent}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML += `
+                    <div class="card-bg p-3 rounded-xl border border-amber-500/30">
+                        <p class="font-bold text-xs text-amber-400 mb-2">❓ ${poll.question}</p>
+                        ${optionsHtml}
+                        <p class="text-[9px] opacity-50 mt-1">إجمالي المشاركين: ${totalVotes}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function getAnnouncementsData() {
+            return JSON.parse(localStorage.getItem('church_targeted_announcements')) || [
+                { id: '1', stageId: 'family', title: 'مواعيد الاجتماع', text: 'غداً الساعة 7 مساءً.' }
+            ];
+        }
+
+        function renderStageAnnouncements() {
+            const container = document.getElementById('stageAnnouncementsContainer');
+            const filtered = getAnnouncementsData().filter(a => a.stageId === currentSelectedStageId);
+            container.innerHTML = filtered.length === 0 ? `<p class="text-[11px] opacity-60 text-center py-2">لا توجد إعلانات.</p>` : '';
+            filtered.forEach(item => {
+                container.innerHTML += `<div class="card-bg p-2.5 rounded-xl border border-amber-500/30"><p class="font-bold text-amber-500 text-xs">${item.title}</p><p class="text-[11px] opacity-80">${item.text}</p></div>`;
+            });
+        }
+
+        function populateDropdowns() {
+            const stages = getStagesData();
+            ['userGroup', 'confStage', 'suggestionStage', 'announcementTargetStage', 'pollTargetStage', 'regAdminStageSelect'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.innerHTML = '';
+                    stages.forEach(s => el.innerHTML += `<option class="text-black" value="${s.id || s.name}">${s.name}</option>`);
+                }
+            });
+        }
+
+        function getLocationGPS() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    document.getElementById('servantAddress').value = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                    alert('تم تحديد الموقع!');
+                }, () => alert('تعذر جلب الموقع.'));
+            }
+        }
+
+        function onGeneralStageChange() {
+            const general = document.getElementById('servantGeneralStage').value;
+            const subContainer = document.getElementById('subGradeContainer');
+            const schoolBox = document.getElementById('schoolGradeBox');
+            const uniBox = document.getElementById('universityBox');
+            const schoolSelect = document.getElementById('servantSchoolGrade');
+            if (!general) { subContainer.classList.add('hidden'); return; }
+            subContainer.classList.remove('hidden');
+            schoolSelect.innerHTML = '';
+            if (general === 'ابتدائي' || general === 'إعدادي' || general === 'ثانوي') {
+                schoolBox.classList.remove('hidden'); uniBox.classList.add('hidden');
+                let grades = general === 'ابتدائي' ? ['أولى ابتدائي', 'ثانية ابتدائي', 'ثالثة ابتدائي', 'رابعة ابتدائي', 'خامسة ابتدائي', 'سادسة ابتدائي'] : (general === 'إعدادي' ? ['أولى إعدادي', 'تانية إعدادي', 'ثالثة إعدادي'] : ['أولى ثانوي', 'تانية ثانوي', 'ثالثة ثانوي']);
+                grades.forEach(g => schoolSelect.innerHTML += `<option class="text-black" value="${g}">${g}</option>`);
+            } else if (general === 'جامعة') { schoolBox.classList.add('hidden'); uniBox.classList.remove('hidden'); }
+            else { schoolBox.classList.add('hidden'); uniBox.classList.add('hidden'); }
+        }
+
+        function submitNewServant(e) {
+            e.preventDefault();
+            const name = document.getElementById('servantName').value.trim();
+            const phone = document.getElementById('servantPhone').value.trim();
+            const generalStage = document.getElementById('servantGeneralStage').value;
+            let pendingRequests = JSON.parse(localStorage.getItem('church_pending_requests') || '[]');
+            pendingRequests.push({ name, phone, generalStage, subGrade: document.getElementById('servantSchoolGrade').value || 'عام' });
+            localStorage.setItem('church_pending_requests', JSON.stringify(pendingRequests));
+            document.getElementById('servantForm').style.display = 'none';
+            document.getElementById('servantSuccessMsg').classList.remove('hidden');
+            setTimeout(() => { closeNewServantModal(); document.getElementById('servantForm').reset(); document.getElementById('servantForm').style.display = 'block'; document.getElementById('servantSuccessMsg').classList.add('hidden'); }, 2000);
+        }
+
+        function renderPendingRequests() {
+            let requests = JSON.parse(localStorage.getItem('church_pending_requests') || '[]');
+            const container = document.getElementById('pendingRequestsContainer');
+            container.innerHTML = requests.length === 0 ? `<p class="text-center opacity-60 text-xs py-2">لا توجد طلبات معلقة.</p>` : '';
+            requests.forEach((req, index) => {
+                container.innerHTML += `<div class="card-bg p-2.5 rounded-xl border border-amber-500/40 mb-2"><p class="font-bold text-amber-500">${req.name} (${req.generalStage})</p><p class="text-[10px]">📞 ${req.phone}</p><div class="flex gap-2 mt-2"><button onclick="approveRequest(${index})" class="flex-1 bg-green-600 text-white py-1 rounded text-[10px]">موافقة</button><button onclick="rejectRequest(${index})" class="flex-1 bg-red-600 text-white py-1 rounded text-[10px]">رفض</button></div></div>`;
+            });
+        }
+
+        function approveRequest(index) {
+            let requests = JSON.parse(localStorage.getItem('church_pending_requests') || '[]');
+            let accepted = requests.splice(index, 1)[0];
+            let servants = JSON.parse(localStorage.getItem('church_all_servants') || '[]');
+            servants.push(accepted);
+            localStorage.setItem('church_pending_requests', JSON.stringify(requests));
+            localStorage.setItem('church_all_servants', JSON.stringify(servants));
+            renderPendingRequests(); renderServantsList();
+        }
+
+        function rejectRequest(index) {
+            let requests = JSON.parse(localStorage.getItem('church_pending_requests') || '[]');
+            requests.splice(index, 1);
+            localStorage.setItem('church_pending_requests', JSON.stringify(requests));
+            renderPendingRequests();
+        }
+
+        function renderServantsList() {
+            let servants = JSON.parse(localStorage.getItem('church_all_servants') || '[]');
+            const container = document.getElementById('servantsListContainer');
+            container.innerHTML = servants.length === 0 ? `<p class="text-center opacity-60 text-xs">لا يوجد مخدومين.</p>` : '';
+            servants.forEach((s, index) => {
+                container.innerHTML += `<div class="card-bg p-2 rounded border flex justify-between items-center mb-1 text-xs"><span>${s.name} (${s.generalStage})</span><button onclick="deleteServant(${index})" class="text-red-400">حذف</button></div>`;
+            });
+        }
+
+        function deleteServant(index) {
+            let servants = JSON.parse(localStorage.getItem('church_all_servants') || '[]');
+            servants.splice(index, 1);
+            localStorage.setItem('church_all_servants', JSON.stringify(servants));
+            renderServantsList();
+        }
+
+        function renderAdminStagesList() {
+            const stages = getStagesData();
+            const listDiv = document.getElementById('adminStagesList');
+            listDiv.innerHTML = '';
+            stages.forEach((stage, index) => {
+                listDiv.innerHTML += `<div class="flex justify-between items-center card-bg p-1.5 rounded border mb-1 text-xs"><span class="font-bold text-amber-500">${stage.name}</span><button onclick="deleteStage(${index})" class="text-red-400">حذف</button></div>`;
+            });
+        }
+
+        function addNewStage() {
+            const name = document.getElementById('newStageName').value.trim();
+            if(!name) return;
+            let stages = getStagesData();
+            stages.push({ id: 'stage_' + Date.now(), name, adminName: 'مسؤول', adminPhone: MASTER_ADMIN_PHONE, activity: 'نشاط جديد' });
+            localStorage.setItem('church_stages_data', JSON.stringify(stages));
+            document.getElementById('newStageName').value = '';
+            renderAdminStagesList(); renderStagesBar();
+        }
+
+        function deleteStage(index) {
+            let stages = getStagesData();
+            stages.splice(index, 1);
+            localStorage.setItem('church_stages_data', JSON.stringify(stages));
+            renderAdminStagesList(); renderStagesBar();
+        }
+
+        function publishTargetedAnnouncement() {
+            const title = document.getElementById('announcementTitle').value.trim();
+            const text = document.getElementById('announcementText').value.trim();
+            if(!title || !text) return;
+            let ann = getAnnouncementsData();
+            ann.push({ stageId: document.getElementById('announcementTargetStage').value, title, text });
+            localStorage.setItem('church_targeted_announcements', JSON.stringify(ann));
+            document.getElementById('announcementTitle').value = ''; document.getElementById('announcementText').value = '';
+            renderStageAnnouncements();
+            alert('تم النشر!');
+        }
+
+        function renderLibrary() {
+            const container = document.getElementById('libraryContainer');
+            if(container) container.innerHTML = `<div class="card-bg p-2.5 rounded-xl border text-xs font-bold">📖 كتاب البستان (قصص آباء البرية)</div>`;
+        }
+
+        function initTheme() {
+            const theme = localStorage.getItem('church_app_theme') || 'light';
+            document.body.className = theme + '-mode min-h-screen flex flex-col items-center justify-start p-0 m-0';
+            const btn = document.getElementById('themeToggleBtn');
+            if(btn) btn.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function toggleTheme() {
+            let theme = localStorage.getItem('church_app_theme') || 'light';
+            localStorage.setItem('church_app_theme', theme === 'light' ? 'dark' : 'light');
+            initTheme();
+        }
+
+        function updateLiveDate() {
+            const now = new Date();
+            const container = document.getElementById('liveDateContainer');
+            if(container) container.innerText = `📅 ${now.toLocaleDateString('ar-EG')}`;
+        }
+        setInterval(updateLiveDate, 1000);
+
+        function openModal() { document.getElementById('regModal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('regModal').classList.add('hidden'); }
+        function openConfessionModal() { document.getElementById('confessionModal').classList.remove('hidden'); }
+        function closeConfessionModal() { document.getElementById('confessionModal').classList.add('hidden'); }
+        function openSuggestionModal() { document.getElementById('suggestionModal').classList.remove('hidden'); }
+        function closeSuggestionModal() { document.getElementById('suggestionModal').classList.add('hidden'); }
+        function openAgendaModal() { document.getElementById('agendaModal').classList.remove('hidden'); }
+        function closeAgendaModal() { document.getElementById('agendaModal').classList.add('hidden'); }
+        function openNotificationsModal() { document.getElementById('notificationsModal').classList.remove('hidden'); }
+        function closeNotificationsModal() { document.getElementById('notificationsModal').classList.add('hidden'); }
+        function openMassesModal() { document.getElementById('massesModal').classList.remove('hidden'); }
+        function closeMassesModal() { document.getElementById('massesModal').classList.add('hidden'); }
+        function openSermonsModal() { document.getElementById('sermonsModal').classList.remove('hidden'); }
+        function closeSermonsModal() { document.getElementById('sermonsModal').classList.add('hidden'); }
+        function openNewServantModal() { document.getElementById('newServantModal').classList.remove('hidden'); }
+        function closeNewServantModal() { document.getElementById('newServantModal').classList.add('hidden'); }
+
+        function openAdminSettings() {
+            renderAdminStagesList();
+            renderServantsList();
+            renderPendingRequests();
+            document.getElementById('adminModal').classList.add('hidden'); // fallback
+            // التحقق من صلاحيات المسؤول العام قبل الفتح
+            if(currentLoggedInUser && currentLoggedInUser.adminRole === 'super_admin') {
+                document.getElementById('adminModal').classList.remove('hidden');
+            } else {
+                alert('عفواً، هذه اللوحة مخصصة للمسؤول العام الشامل فقط.');
+            }
+        }
+        function closeAdminSettings() { document.getElementById('adminModal').classList.add('hidden'); }
+
+        function submitForm(e) { e.preventDefault(); alert('تم الحجز بنجاح!'); closeModal(); }
+        function submitConfession(e) { e.preventDefault(); alert('تم حجز موعد الاعتراف!'); closeConfessionModal(); }
+        function submitSuggestion(e) { e.preventDefault(); alert('تم إرسال المقترح!'); closeSuggestionModal(); }
+
+        window.onload = function() {
+            initTheme();
+            updateLiveDate();
+            applyChurchImage();
+            getAdminsList();
+
+            setTimeout(() => {
+                document.getElementById('splashScreen').classList.add('hidden');
+                const savedUser = localStorage.getItem('church_logged_in_user');
+                if (savedUser) {
+                    currentLoggedInUser = JSON.parse(savedUser);
+                    enterApp();
+                } else {
+                    document.getElementById('authGateScreen').classList.remove('hidden');
+                    checkBiometricAvailability();
+                }
+            }, 1500);
+        };
+    </script>
+</body>
+</html>
