@@ -33,7 +33,7 @@
                 <img id="splashIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
             </div>
             <h1 class="text-xs font-bold gold-accent tracking-wider">إيبارشية بني سويف للأقباط الأرثوذكس</h1>
-            <h2 class="text-sm font-black text-white mt-1 mb-6">كنيسة السيدة العذراء مريم والشهيد أبانوب بالواسطي</h2>
+            <h2 class="text-base font-black text-white mt-1 mb-6">كنيسة السيدة العذراء والشهيد أبانوب بالواسطي</h2>
             <div class="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
     </div>
@@ -44,7 +44,7 @@
                 <img id="gateIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
             </div>
             <h1 class="text-xs font-bold gold-accent">إيبارشية بني سويف للأقباط الأرثوذكس</h1>
-            <h2 class="text-xs font-black text-white mt-1 mb-4">كنيسة السيدة العذراء مريم والشهيد أبانوب بالواسطي</h2>
+            <h2 class="text-sm font-black text-white mt-1 mb-4">كنيسة السيدة العذراء والشهيد أبانوب بالواسطي</h2>
             
             <div id="authOptionsView" class="space-y-3">
                 <p class="text-xs text-gray-300 mb-4">يرجى اختيار نوع تسجيل الدخول للمتابعة:</p>
@@ -117,7 +117,7 @@
                     <img id="headerIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover">
                 </div>
                 <div>
-                    <h1 class="text-[10px] font-bold gold-accent">كنيسة السيدة العذراء مريم والشهيد أبانوب بالواسطي</h1>
+                    <h1 class="text-[11px] font-bold gold-accent">كنيسة السيدة العذراء بالواسطي</h1>
                     <h2 id="currentUserBadge" class="text-[10px] text-gray-200">مرحباً بك</h2>
                 </div>
             </div>
@@ -131,6 +131,16 @@
             <div class="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center flex justify-between items-center">
                 <p id="liveDateContainer" class="text-xs font-bold gold-accent">جارِ تحديث التاريخ...</p>
                 <button onclick="openAdminSettings()" id="adminSettingsBtn" class="hidden bg-amber-600 text-white px-2 py-1 rounded-lg text-[10px] font-bold shadow">⚙️ إدارة النظام الشاملة</button>
+            </div>
+
+            <!-- قسم تذكير أعياد الميلاد للمسؤول -->
+            <div id="birthdaysAlertSection" class="hidden px-4 pt-3">
+                <div class="card-bg border-2 border-amber-500 rounded-2xl p-3.5 shadow-md">
+                    <h4 class="font-bold text-xs gold-accent mb-2 flex items-center gap-1.5">
+                        <span>🎂</span> تذكير أعياد ميلاد مخدومي المرحلة اليوم:
+                    </h4>
+                    <div id="todaysBirthdaysContainer" class="space-y-2"></div>
+                </div>
             </div>
 
             <div class="p-6 bg-gradient-to-b from-blue-950 via-indigo-950 to-blue-900 text-white text-center relative overflow-hidden">
@@ -172,6 +182,29 @@
 
             <div class="px-4 py-2">
                 <div id="stageContentContainer" class="border-2 gold-border rounded-2xl p-4 card-bg shadow-md"></div>
+            </div>
+
+            <!-- قسم دردشة مجموعة المرحلة التفاعلية -->
+            <div class="px-4 py-2">
+                <div class="card-bg border-2 border-amber-500/50 rounded-2xl p-4 shadow-md flex flex-col h-80">
+                    <div class="flex justify-between items-center border-b pb-2 mb-2">
+                        <h4 class="font-bold text-xs gold-accent flex items-center gap-1.5">
+                            <span>💬</span> شات ومجموعة المرحلة الجماعي:
+                        </h4>
+                        <span id="chatRoomTitleBadge" class="text-[10px] bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full font-bold">عام</span>
+                    </div>
+                    <!-- صندوق عرض الرسائل -->
+                    <div id="chatMessagesContainer" class="flex-1 overflow-y-auto space-y-2.5 pr-1 text-xs mb-2"></div>
+                    <!-- صندوق الكتابة وإرفاق الصور -->
+                    <div class="flex items-center gap-1.5 pt-2 border-t">
+                        <label class="cursor-pointer bg-gray-700 hover:bg-gray-800 text-amber-400 p-2 rounded-xl text-sm transition" title="رفع صورة">
+                            📷
+                            <input type="file" accept="image/*" id="chatImageInput" onchange="sendChatImage(event)" class="hidden">
+                        </label>
+                        <input type="text" id="chatMessageInput" placeholder="اكتب رسالة للمجموعة..." class="flex-1 p-2 border rounded-xl text-xs outline-none bg-transparent" onkeypress="handleChatKeyPress(event)">
+                        <button onclick="sendChatMessage()" class="gold-bg hover:bg-amber-600 text-gray-950 px-3.5 py-2 rounded-xl text-xs font-bold shadow">إرسال 🚀</button>
+                    </div>
+                </div>
             </div>
 
             <div class="px-4 py-2">
@@ -219,6 +252,11 @@
         <footer class="mt-auto py-4 text-center border-t card-bg">
             <p class="text-xs font-bold gold-accent">تم التصميم بواسطة: مينا كامل إبراهيم</p>
         </footer>
+    </div>
+
+    <!-- Modal معائرة وتكبير الصور المرسلة في الشات -->
+    <div id="imageLightBoxModal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-2" onclick="closeLightBox()">
+        <img id="lightBoxImg" src="" alt="صورة مكبرة" class="max-w-full max-h-[90vh] rounded-xl object-contain">
     </div>
 
     <div id="adminRegisterModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
@@ -420,7 +458,7 @@
             if (!url) { alert('أدخل رابط الصورة أو اختر صورة من جهازك.'); return; }
             localStorage.setItem('church_app_image', url);
             applyChurchImage();
-            alert('تم تحديث وتعديل صورة الكنيسة بنجاح!');
+            alert('تم تحديث وحفظ صورة الكنيسة بنجاح!');
         }
 
         function applyChurchImage() {
@@ -578,36 +616,17 @@
             }
         }
 
-        // تفعيل بصمة الجهاز الحقيقية (الوجه / الأصبع) عبر Web Authentication API
         async function loginWithBiometrics() {
             const savedBioUser = localStorage.getItem('church_biometric_user');
-            if(!savedBioUser) { alert('لا توجد بيانات مسجلة للدخول بالبصمة.'); return; }
-            
+            if(!savedBioUser) { alert('لا توجد بصمة محفوظة.'); return; }
             try {
-                if (window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) {
-                    const publicKey = {
-                        challenge: new Uint8Array([21, 31, 105, 94, 122, 55, 0, 11]),
-                        rp: { name: "كنيسة العذراء وأبانوب بالواسطي" },
-                        user: {
-                            id: new Uint8Array(16),
-                            name: "church_user",
-                            displayName: "مخدوم الكنيسة"
-                        },
-                        pubKeyCredParams: [{ alg: -7, type: "public-key" }],
-                        timeout: 60000,
-                        authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" }
-                    };
-                    
-                    // استدعاء بصمة الهاتف الفعلية
-                    await navigator.credentials.get({ publicKey: { challenge: publicKey.challenge } });
+                if (window.PublicKeyCredential && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+                    await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
                 }
-                
                 currentLoggedInUser = JSON.parse(savedBioUser);
                 localStorage.setItem('church_logged_in_user', JSON.stringify(currentLoggedInUser));
                 enterApp();
             } catch (err) {
-                console.log("Biometric note: ", err);
-                // في حالة إلغاء المستخدم أو عدم توفر متطلبات الـ API بنجاح تام، نسمح بالدخول المباشر كبديل مرن لتجربة المستخدم
                 currentLoggedInUser = JSON.parse(savedBioUser);
                 localStorage.setItem('church_logged_in_user', JSON.stringify(currentLoggedInUser));
                 enterApp();
@@ -630,16 +649,67 @@
                     document.getElementById('createPollBtn').classList.remove('hidden');
                 } else {
                     document.getElementById('currentUserBadge').innerText = `مسؤول مرحلة (${currentLoggedInUser.stage}): ${currentLoggedInUser.name}`;
-                    document.getElementById('adminSettingsBtn').classList.add('hidden');
-                    document.getElementById('createPollBtn').classList.remove('hidden');
+                    document.getElementById('adminSettingsBtn').classList.add('hidden'); 
+                    document.getElementById('createPollBtn').classList.remove('hidden'); 
+                    currentSelectedStageId = currentLoggedInUser.stage;
                 }
+                checkTodaysBirthdays();
             } else {
                 document.getElementById('currentUserBadge').innerText = `مرحباً بك يا ${currentLoggedInUser.name} (${currentLoggedInUser.stage})`;
                 document.getElementById('adminSettingsBtn').classList.add('hidden');
                 document.getElementById('createPollBtn').classList.add('hidden');
+                document.getElementById('birthdaysAlertSection').classList.add('hidden');
             }
             renderStagesBar();
             renderLibrary();
+        }
+
+        function checkTodaysBirthdays() {
+            if (!currentLoggedInUser || currentLoggedInUser.type !== 'admin') return;
+
+            const today = new Date();
+            const currentMonthDay = String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+            
+            let servants = JSON.parse(localStorage.getItem('church_all_servants') || '[]');
+            
+            let todaysBirthdays = servants.filter(s => {
+                if (!s.dob) return false;
+                let sMonthDay = s.dob.substring(5, 10);
+                let isMatchDay = (sMonthDay === currentMonthDay);
+                
+                if (currentLoggedInUser.adminRole === 'super_admin') {
+                    return isMatchDay;
+                } else {
+                    return isMatchDay && (s.generalStage === currentLoggedInUser.stage);
+                }
+            });
+
+            const alertSection = document.getElementById('birthdaysAlertSection');
+            const container = document.getElementById('todaysBirthdaysContainer');
+
+            if (todaysBirthdays.length > 0) {
+                alertSection.classList.remove('hidden');
+                container.innerHTML = '';
+                todaysBirthdays.forEach(person => {
+                    let cleanPhone = person.phone.startsWith('0') ? '2'+person.phone : person.phone;
+                    let msg = `كل سنة وأنت طيب يا ${person.name}! عيد ميلاد سعيد ربنا يبارك في عمرك وحياتك وتفرح دايماً.`;
+                    let waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+
+                    container.innerHTML += `
+                        <div class="card-bg p-2.5 rounded-xl border border-amber-400/50 flex justify-between items-center text-xs">
+                            <div>
+                                <span class="font-bold text-amber-500">🎉 ${person.name}</span>
+                                <span class="text-[10px] opacity-75 block">المرحلة: ${person.generalStage}</span>
+                            </div>
+                            <a href="${waLink}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1.5 rounded-lg text-[10px] shadow flex items-center gap-1">
+                                <span>💬 إرسال تهنئة</span>
+                            </a>
+                        </div>
+                    `;
+                });
+            } else {
+                alertSection.classList.add('hidden');
+            }
         }
 
         function logoutApp() {
@@ -655,8 +725,15 @@
             const stages = getStagesData();
             const bar = document.getElementById('stagesBar');
             bar.innerHTML = '';
-            stages.forEach(stage => {
-                const isActive = stage.id === currentSelectedStageId;
+            
+            let visibleStages = stages;
+            if (currentLoggedInUser && currentLoggedInUser.type === 'admin' && currentLoggedInUser.adminRole !== 'super_admin') {
+                visibleStages = stages.filter(s => s.name === currentLoggedInUser.stage || s.id === currentLoggedInUser.stage);
+                if(visibleStages.length === 0) visibleStages = stages; 
+            }
+
+            visibleStages.forEach(stage => {
+                const isActive = stage.id === currentSelectedStageId || stage.name === currentSelectedStageId;
                 bar.innerHTML += `
                     <button onclick="selectStage('${stage.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition border ${isActive ? 'bg-amber-600 text-white border-amber-600 shadow' : 'card-bg opacity-80'}">
                         ${stage.name}
@@ -666,6 +743,7 @@
             renderStageContent();
             renderStageAnnouncements();
             renderStagePolls();
+            renderChatMessages();
             populateDropdowns();
         }
 
@@ -673,7 +751,7 @@
 
         function renderStageContent() {
             const stages = getStagesData();
-            const current = stages.find(s => s.id === currentSelectedStageId);
+            const current = stages.find(s => s.id === currentSelectedStageId || s.name === currentSelectedStageId);
             const container = document.getElementById('stageContentContainer');
             if (!current) return;
             container.innerHTML = `
@@ -684,7 +762,97 @@
                 <h4 class="font-bold text-sm mb-1">${current.activity}</h4>
                 <button onclick="openModal()" class="w-full gold-bg hover:bg-amber-600 text-gray-950 font-bold py-2 rounded-xl text-xs shadow mt-2">✨ حجز في نشاط ${current.name}</button>
             `;
+            document.getElementById('chatRoomTitleBadge').innerText = current.name;
         }
+
+        // --- وظائف دردشة ومجموعات المرحلة (Chat & Images) ---
+        function getAllChatsData() {
+            return JSON.parse(localStorage.getItem('church_stages_chats') || '{}');
+        }
+
+        function renderChatMessages() {
+            const chats = getAllChatsData();
+            const container = document.getElementById('chatMessagesContainer');
+            const stageKey = currentSelectedStageId;
+            let messages = chats[stageKey] || [];
+
+            container.innerHTML = messages.length === 0 ? `<p class="text-[11px] opacity-50 text-center py-6">لا توجد رسائل في هذه المجموعة بعد. كن أول المشاركين! 💬</p>` : '';
+            
+            messages.forEach(msg => {
+                let timeStr = new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                let isMe = currentLoggedInUser && msg.senderName === currentLoggedInUser.name;
+                
+                let contentHtml = msg.type === 'image' 
+                    ? `<img src="${msg.content}" onclick="openLightBox('${msg.content}')" class="max-w-[200px] max-h-[200px] rounded-lg cursor-pointer mt-1 object-cover border border-amber-400/40">`
+                    : `<p class="break-words">${msg.content}</p>`;
+
+                container.innerHTML += `
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2">
+                        <span class="text-[9px] opacity-70 mb-0.5 px-1 font-bold text-amber-500">${msg.senderName} (${msg.roleLabel || 'عضو'})</span>
+                        <div class="p-2.5 rounded-2xl max-w-[85%] shadow-sm ${isMe ? 'bg-amber-500/20 border border-amber-500/40' : 'card-bg border'}">
+                            ${contentHtml}
+                            <span class="text-[8px] opacity-50 block text-left mt-1">${timeStr}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatMessageInput');
+            const text = input.value.trim();
+            if(!text) return;
+
+            saveAndPushMessage({
+                senderName: currentLoggedInUser ? currentLoggedInUser.name : 'مستخدم ضيف',
+                roleLabel: currentLoggedInUser && currentLoggedInUser.type === 'admin' ? 'مسؤول المرحلة' : 'مخدوم',
+                type: 'text',
+                content: text,
+                time: Date.now()
+            });
+            input.value = '';
+        }
+
+        function handleChatKeyPress(e) {
+            if(e.key === 'Enter') sendChatMessage();
+        }
+
+        function sendChatImage(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                saveAndPushMessage({
+                    senderName: currentLoggedInUser ? currentLoggedInUser.name : 'مستخدم ضيف',
+                    roleLabel: currentLoggedInUser && currentLoggedInUser.type === 'admin' ? 'مسؤول المرحلة' : 'مخدوم',
+                    type: 'image',
+                    content: event.target.result,
+                    time: Date.now()
+                });
+            };
+            reader.readAsDataURL(file);
+            e.target.value = ''; // لإعادة ضبط الحقل لنفس الصورة إذا أردت رفعها مجدداً
+        }
+
+        function saveAndPushMessage(msgObj) {
+            let chats = getAllChatsData();
+            let stageKey = currentSelectedStageId;
+            if(!chats[stageKey]) chats[stageKey] = [];
+            chats[stageKey].push(msgObj);
+            localStorage.setItem('church_stages_chats', JSON.stringify(chats));
+            renderChatMessages();
+        }
+
+        function openLightBox(imgSrc) {
+            document.getElementById('lightBoxImg').src = imgSrc;
+            document.getElementById('imageLightBoxModal').classList.remove('hidden');
+        }
+        function closeLightBox() {
+            document.getElementById('imageLightBoxModal').classList.add('hidden');
+        }
+        // ----------------------------------------------------
 
         function getPollsData() {
             return JSON.parse(localStorage.getItem('church_stage_polls')) || [
@@ -728,7 +896,7 @@
 
         function renderStagePolls() {
             const container = document.getElementById('stagePollsContainer');
-            let polls = getPollsData().filter(p => p.stageId === currentSelectedStageId);
+            let polls = getPollsData().filter(p => p.stageId === currentSelectedStageId || p.stageId === getStageNameById(currentSelectedStageId));
             container.innerHTML = polls.length === 0 ? `<p class="text-[11px] opacity-60 text-center py-2">لا توجد استبيانات نشطة لهذه المرحلة.</p>` : '';
             
             polls.forEach(poll => {
@@ -760,6 +928,12 @@
             });
         }
 
+        function getStageNameById(id) {
+            let stages = getStagesData();
+            let found = stages.find(s => s.id === id);
+            return found ? found.name : id;
+        }
+
         function getAnnouncementsData() {
             return JSON.parse(localStorage.getItem('church_targeted_announcements')) || [
                 { id: '1', stageId: 'family', title: 'مواعيد الاجتماع', text: 'غداً الساعة 7 مساءً.' }
@@ -768,7 +942,7 @@
 
         function renderStageAnnouncements() {
             const container = document.getElementById('stageAnnouncementsContainer');
-            const filtered = getAnnouncementsData().filter(a => a.stageId === currentSelectedStageId);
+            const filtered = getAnnouncementsData().filter(a => a.stageId === currentSelectedStageId || a.stageId === getStageNameById(currentSelectedStageId));
             container.innerHTML = filtered.length === 0 ? `<p class="text-[11px] opacity-60 text-center py-2">لا توجد إعلانات.</p>` : '';
             filtered.forEach(item => {
                 container.innerHTML += `<div class="card-bg p-2.5 rounded-xl border border-amber-500/30"><p class="font-bold text-amber-500 text-xs">${item.title}</p><p class="text-[11px] opacity-80">${item.text}</p></div>`;
@@ -781,7 +955,7 @@
                 const el = document.getElementById(id);
                 if(el) {
                     el.innerHTML = '';
-                    stages.forEach(s => el.innerHTML += `<option class="text-black" value="${s.id || s.name}">${s.name}</option>`);
+                    stages.forEach(s => el.innerHTML += `<option class="text-black" value="${s.id}">${s.name}</option>`);
                 }
             });
         }
@@ -815,11 +989,14 @@
         function submitNewServant(e) {
             e.preventDefault();
             const name = document.getElementById('servantName').value.trim();
+            const dob = document.getElementById('servantDob').value;
             const phone = document.getElementById('servantPhone').value.trim();
             const generalStage = document.getElementById('servantGeneralStage').value;
+            
             let pendingRequests = JSON.parse(localStorage.getItem('church_pending_requests') || '[]');
-            pendingRequests.push({ name, phone, generalStage, subGrade: document.getElementById('servantSchoolGrade').value || 'عام' });
+            pendingRequests.push({ name, dob, phone, generalStage, subGrade: document.getElementById('servantSchoolGrade').value || 'عام' });
             localStorage.setItem('church_pending_requests', JSON.stringify(pendingRequests));
+            
             document.getElementById('servantForm').style.display = 'none';
             document.getElementById('servantSuccessMsg').classList.remove('hidden');
             setTimeout(() => { closeNewServantModal(); document.getElementById('servantForm').reset(); document.getElementById('servantForm').style.display = 'block'; document.getElementById('servantSuccessMsg').classList.add('hidden'); }, 2000);
@@ -830,7 +1007,7 @@
             const container = document.getElementById('pendingRequestsContainer');
             container.innerHTML = requests.length === 0 ? `<p class="text-center opacity-60 text-xs py-2">لا توجد طلبات معلقة.</p>` : '';
             requests.forEach((req, index) => {
-                container.innerHTML += `<div class="card-bg p-2.5 rounded-xl border border-amber-500/40 mb-2"><p class="font-bold text-amber-500">${req.name} (${req.generalStage})</p><p class="text-[10px]">📞 ${req.phone}</p><div class="flex gap-2 mt-2"><button onclick="approveRequest(${index})" class="flex-1 bg-green-600 text-white py-1 rounded text-[10px]">موافقة</button><button onclick="rejectRequest(${index})" class="flex-1 bg-red-600 text-white py-1 rounded text-[10px]">رفض</button></div></div>`;
+                container.innerHTML += `<div class="card-bg p-2.5 rounded-xl border border-amber-500/40 mb-2"><p class="font-bold text-amber-500">${req.name} (${req.generalStage})</p><p class="text-[10px]">📞 ${req.phone} | عيد الميلاد: ${req.dob || 'غير محدد'}</p><div class="flex gap-2 mt-2"><button onclick="approveRequest(${index})" class="flex-1 bg-green-600 text-white py-1 rounded text-[10px]">موافقة</button><button onclick="rejectRequest(${index})" class="flex-1 bg-red-600 text-white py-1 rounded text-[10px]">رفض</button></div></div>`;
             });
         }
 
@@ -856,7 +1033,7 @@
             const container = document.getElementById('servantsListContainer');
             container.innerHTML = servants.length === 0 ? `<p class="text-center opacity-60 text-xs">لا يوجد مخدومين.</p>` : '';
             servants.forEach((s, index) => {
-                container.innerHTML += `<div class="card-bg p-2 rounded border flex justify-between items-center mb-1 text-xs"><span>${s.name} (${s.generalStage})</span><button onclick="deleteServant(${index})" class="text-red-400">حذف</button></div>`;
+                container.innerHTML += `<div class="card-bg p-2 rounded border flex justify-between items-center mb-1 text-xs"><span>${s.name} (${s.generalStage}) - 🎂 ${s.dob || '-'}</span><button onclick="deleteServant(${index})" class="text-red-400">حذف</button></div>`;
             });
         }
 
@@ -948,21 +1125,20 @@
         function closeNewServantModal() { document.getElementById('newServantModal').classList.add('hidden'); }
 
         function openAdminSettings() {
-            renderAdminStagesList();
-            renderServantsList();
-            renderPendingRequests();
-            document.getElementById('adminModal').classList.add('hidden');
             if(currentLoggedInUser && currentLoggedInUser.adminRole === 'super_admin') {
+                renderAdminStagesList();
+                renderServantsList();
+                renderPendingRequests();
                 document.getElementById('adminModal').classList.remove('hidden');
             } else {
-                alert('عفواً، هذه اللوحة مخصصة للمسؤول العام الشامل فقط.');
+                alert('عفواً، هذه اللوحة الشاملة مخصصة للمسؤول العام الشامل فقط.');
             }
         }
         function closeAdminSettings() { document.getElementById('adminModal').classList.add('hidden'); }
 
         function submitForm(e) { e.preventDefault(); alert('تم الحجز بنجاح!'); closeModal(); }
         function submitConfession(e) { e.preventDefault(); alert('تم حجز موعد الاعتراف!'); closeConfessionModal(); }
-        function submitSuggestion(e) { e.preventDefault(); alert('تم إرسال المقترح!'); closeSuggestionModal(); }
+        function submitSuggestion(e) {, e.preventDefault(); alert('تم إرسال المقترح!'); closeSuggestionModal(); }
 
         window.onload = function() {
             initTheme();
