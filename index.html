@@ -44,7 +44,7 @@
                 <img id="gateIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
             </div>
             <h1 class="text-xs font-bold gold-accent">إيبارشية بني سويف للأقباط الأرثوذكس</h1>
-            <h2 class="text-sm font-black text-white mt-1 mb-4">كنيسة السيدة العذراء والشهيد أبانوب بالواسطي</h2>
+            <h2 class="text-sm font-black text-white mt-1 mb-4">كنيسة السيدة العذراء مريم والشهيد أبانوب بالواسطي</h2>
             
             <div id="authOptionsView" class="space-y-3">
                 <p class="text-xs text-gray-300 mb-4">يرجى اختيار نوع تسجيل الدخول للمتابعة:</p>
@@ -117,7 +117,7 @@
                     <img id="headerIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover">
                 </div>
                 <div>
-                    <h1 class="text-[11px] font-bold gold-accent">كنيسة السيدة العذراء بالواسطي</h1>
+                    <h1 class="text-[11px] font-bold gold-accent">كنيسة السيدة العذراء مريم والشهيد ابانوب بالواسطي</h1>
                     <h2 id="currentUserBadge" class="text-[10px] text-gray-200">مرحباً بك</h2>
                 </div>
             </div>
@@ -131,6 +131,20 @@
             <div class="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center flex justify-between items-center">
                 <p id="liveDateContainer" class="text-xs font-bold gold-accent">جارِ تحديث التاريخ...</p>
                 <button onclick="openAdminSettings()" id="adminSettingsBtn" class="hidden bg-amber-600 text-white px-2 py-1 rounded-lg text-[10px] font-bold shadow">⚙️ إدارة النظام الشاملة</button>
+            </div>
+
+            <!-- قسم آية كل يوم من الكتاب المقدس -->
+            <div class="px-4 pt-3">
+                <div class="card-bg border-2 border-amber-500/60 rounded-2xl p-3.5 shadow-md relative overflow-hidden">
+                    <div class="absolute -left-3 -bottom-3 text-5xl opacity-10">📖</div>
+                    <div class="flex justify-between items-center mb-1">
+                        <h4 class="font-bold text-xs gold-accent flex items-center gap-1.5">
+                            <span>✨</span> آية اليوم الروحية:
+                        </h4>
+                        <span id="verseRefBadge" class="text-[10px] bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full font-bold"></span>
+                    </div>
+                    <p id="dailyVerseText" class="text-xs italic opacity-90 leading-relaxed text-right pr-1"></p>
+                </div>
             </div>
 
             <!-- قسم تذكير أعياد الميلاد للمسؤول -->
@@ -437,6 +451,84 @@
     <script>
         let currentLoggedInUser = null; 
         const MASTER_ADMIN_PHONE = "01204375306"; // رقم المسؤول الأساسي المعتمد
+
+        // قائمة الآيات اليومية من الكتاب المقدس لعام كامل (تتغير تلقائياً حسب اليوم من السنة)
+        const dailyVersesList = [
+            { text: "الرب راعي فلا يعوزني شيء. في مراع خضر يربضني، إلى مياه الراحة يوردني.", ref: "مز 23: 1-2" },
+            { text: "إكتفوا بما هو عندكم، لأنه هو قال: لا أهملك ولا أتركك.", ref: "عب 13: 5" },
+            { text: "كل حين صَلُّوا ولا تملوا.", ref: "لو 18: 1" },
+            { text: "تكلّموا بعضكم مع بعض بمزامير وتسابيح وأغاني روحيّة، مُترنّمين ومُرتّلين في قلوبكم للرب.", ref: "أف 5: 19" },
+            { text: "طوبى للصلحاء لأنهم يعاينون الله.", ref: "مت 5: 8" },
+            { text: "سلاماً أترك لكم. سلامي أعطيكم. ليس كما يعطي العالم أعطيكم أنا.", ref: "يو 14: 27" },
+            { text: "ثقوا. أنا هو، لا تخافوا.", ref: "مر 6: 50" },
+            { text: "اطلبوا الملكوت أولاً وبره وهذه كلها تزاد لكم.", ref: "مت 6: 33" },
+            { text: "اصنعوا خيراً لمبغويكم، وصلوا لأجل الذين يسيئون إليكم.", ref: "لو 6: 28" },
+            { text: "محبة المسيح تحصرنا.", ref: "2 كو 5: 14" },
+            { text: "اصبروا في الضيق، واواظبوا على الصلاة.", ref: "رو 12: 12" },
+            { text: "تعالوا إليّ يا جميع المتعبين والثقيلي الحمل وأنا أريحكم.", ref: "مت 11: 28" },
+            { text: "الرب نوري وخلاصي فممن أخاف؟ الرب حصن حياتي فممن أرتعب؟", ref: "مز 27: 1" },
+            { text: "إن كان الله معنا فمن علينا؟", ref: "رو 8: 31" },
+            { text: "فرحاً أفرح بالرب، وتلذذ نفسي بإلهي.", ref: "إش 61: 10" },
+            { text: "طوبى للراعي الذين يعملون السلام، لأنهم أبناء الله يدعون.", ref: "مت 5: 9" },
+            { text: "استطيع كل شيء في المسيح الذي يتقنيني.", ref: "في 4: 13" },
+            { text: "في العالم سيكون لكم ضيق، ولكن ثقوا: أنا قد غلبت العالم.", ref: "يو 16: 33" },
+            { text: "طوبى للرجل الذي يحتمل التجربة، لأنه إذا تزكى ينال إكليل الحياة.", ref: "يع 1: 12" },
+            { text: "لأننا نمشي بالإيمان لا بالعيان.", ref: "2 كو 5: 7" },
+            { text: "ثبتوا أفكاركم على ما فوق لا على ما على الأرض.", ref: "كو 3: 2" },
+            { text: "افرحوا في الرب كل حين، وأقول أيضاً افرحوا.", ref: "في 4: 4" },
+            { text: "الرب جالس على الطوفان، والرب يجلس ملكاً إلى الأبد.", ref: "مز 29: 10" },
+            { text: "طوبى للأنقاء القلوب، لأنهم يعاينون الله.", ref: "مت 5: 8" },
+            { text: "محبة الله قد انسكبت في قلوبنا بالروح القدس المعطى لنا.", ref: "رو 5: 5" },
+            { text: "طوبى للجياع والعطاش إلى البر، لأنهم يشبعون.", ref: "مت 5: 6" },
+            { text: "طوبى للودعاء، لأنهم يرثون الأرض.", ref: "مت 5: 5" },
+            { text: "تكلّم يا رب لأن عبدك سامع.", ref: "1 صم 3: 9" },
+            { text: "طوبى للرحماء، لأنهم يرحمون.", ref: "مت 5: 7" },
+            { text: "هوذا الآن وقت مقبول، هوذا الآن يوم خلاص.", ref: "2 كو 6: 2" },
+            { text: "أستودع روحي في يديك، فديتني يا رب إله الحق.", ref: "مز 31: 5" }
+        ];
+
+        function loadDailyVerse() {
+            const now = new Date();
+            // حساب رقم اليوم في السنة لاختيار آية متجددة يومياً
+            const startOfYear = new Date(now.getFullYear(), 0, 0);
+            const diff = (now - startOfYear) + ((startOfYear.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+            const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            const verseObj = dailyVersesList[dayOfYear % dailyVersesList.length];
+            document.getElementById('dailyVerseText').innerText = `« ${verseObj.text} »`;
+            document.getElementById('verseRefBadge').innerText = verseObj.ref;
+        }
+
+        // دالة تحويل التاريخ الميلادي إلى التاريخ القبطي بدقة
+        function getCopticDateString(date) {
+            let gYear = date.getFullYear();
+            let gMonth = date.getMonth() + 1;
+            let gDay = date.getDate();
+
+            // خوارزمية حساب التاريخ القبطي التقريبي بناء على رأس السنة القبطية (1 توت = 11 أو 12 سبتمبر)
+            let isLeapG = (gYear % 4 === 0 && gYear % 100 !== 0) || (gYear % 400 === 0);
+            let copticYear = gYear - 284;
+            if (gMonth < 9 || (gMonth === 9 && gDay < 11)) {
+                copticYear -= 1;
+            }
+
+            let copticEpoch = new Date(gYear, 8, isLeapG ? 12 : 11);
+            if (date < copticEpoch) {
+                copticEpoch = new Date(gYear - 1, 8, ((gYear - 1) % 4 === 0 && (gYear - 1) % 100 !== 0) || ((gYear - 1) % 400 === 0) ? 12 : 11);
+            }
+
+            let diffDays = Math.floor((date - copticEpoch) / (1000 * 60 * 60 * 24));
+            let copticMonth = Math.floor(diffDays / 30) + 1;
+            let copticDay = (diffDays % 30) + 1;
+
+            const copticMonthsNames = [
+                "توت", "بابه", "هاتور", "كياك", "طوبة", "أشير", 
+                "برمهات", "برمودة", "بشنس", "بؤونة", "أبيب", "مسرى", "النسئ"
+            ];
+
+            let mName = copticMonthsNames[copticMonth - 1] || "توت";
+            return `${copticDay} ${mName} ${copticYear} ش`;
+        }
 
         function getChurchImage() {
             return localStorage.getItem('church_app_image') || 'https://i.ibb.co/6y402v7/1000080640.jpg';
@@ -765,7 +857,6 @@
             document.getElementById('chatRoomTitleBadge').innerText = current.name;
         }
 
-        // --- وظائف دردشة ومجموعات المرحلة (Chat & Images) ---
         function getAllChatsData() {
             return JSON.parse(localStorage.getItem('church_stages_chats') || '{}');
         }
@@ -852,7 +943,6 @@
         function closeLightBox() {
             document.getElementById('imageLightBoxModal').classList.add('hidden');
         }
-        // ----------------------------------------------------
 
         function getPollsData() {
             return JSON.parse(localStorage.getItem('church_stage_polls')) || [
@@ -1103,7 +1193,11 @@
         function updateLiveDate() {
             const now = new Date();
             const container = document.getElementById('liveDateContainer');
-            if(container) container.innerText = `📅 ${now.toLocaleDateString('ar-EG')}`;
+            if(container) {
+                let gregStr = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                let copticStr = getCopticDateString(now);
+                container.innerText = `📅 ${gregStr} | ${copticStr}`;
+            }
         }
         setInterval(updateLiveDate, 1000);
 
@@ -1143,6 +1237,7 @@
         window.onload = function() {
             initTheme();
             updateLiveDate();
+            loadDailyVerse();
             applyChurchImage();
             getAdminsList();
 
