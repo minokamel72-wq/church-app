@@ -254,7 +254,7 @@
         </footer>
     </div>
 
-    <!-- Modal معائرة وتكبير الصور المرسلة في الشات -->
+    <!-- Modal معاينة وتكبير الصور المرسلة في الشات -->
     <div id="imageLightBoxModal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-2" onclick="closeLightBox()">
         <img id="lightBoxImg" src="" alt="صورة مكبرة" class="max-w-full max-h-[90vh] rounded-xl object-contain">
     </div>
@@ -833,7 +833,7 @@
                 });
             };
             reader.readAsDataURL(file);
-            e.target.value = ''; // لإعادة ضبط الحقل لنفس الصورة إذا أردت رفعها مجدداً
+            e.target.value = ''; 
         }
 
         function saveAndPushMessage(msgObj) {
@@ -1138,7 +1138,7 @@
 
         function submitForm(e) { e.preventDefault(); alert('تم الحجز بنجاح!'); closeModal(); }
         function submitConfession(e) { e.preventDefault(); alert('تم حجز موعد الاعتراف!'); closeConfessionModal(); }
-        function submitSuggestion(e) {, e.preventDefault(); alert('تم إرسال المقترح!'); closeSuggestionModal(); }
+        function submitSuggestion(e) { e.preventDefault(); alert('تم إرسال المقترح!'); closeSuggestionModal(); }
 
         window.onload = function() {
             initTheme();
