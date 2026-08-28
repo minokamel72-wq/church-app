@@ -33,7 +33,7 @@
                 <img id="splashIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
             </div>
             <h1 class="text-xs font-bold gold-accent tracking-wider">إيبارشية بني سويف للأقباط الأرثوذكس</h1>
-            <h2 class="text-base font-black text-white mt-1 mb-6">كنيسة السيدة العذراء والشهيد أبانوب بالواسطي</h2>
+            <h2 class="text-base font-black text-white mt-1 mb-6">كنيسة السيدة العذراء مريم والشهيد أبانوب بالواسطي</h2>
             <div class="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
     </div>
@@ -423,7 +423,7 @@
                         <option class="text-black" value="ابتدائي">ابتدائي</option>
                         <option class="text-black" value="إعدادي">إعدادي</option>
                         <option class="text-black" value="ثانوي">ثانوي</option>
-                        <option class="text-black" value="جامعة">جامعة</option>
+                        <option class="text-black" value="جامعة وخرجين">جامعة وخريجين</option>
                     </select>
                 </div>
                 <div id="subGradeContainer" class="hidden space-y-3 p-3 rounded-xl border card-bg">
@@ -503,7 +503,7 @@
         </div>
     </div>
 
-    <!-- نافذة القداسات (محدثة مع إمكانية الإضافة والتعديل للمسؤول) -->
+    <!-- نافذة القداسات -->
     <div id="massesModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
         <div class="app-container w-full max-w-sm rounded-2xl p-5 shadow-2xl relative max-h-[90vh] overflow-y-auto border">
             <button onclick="closeMassesModal()" class="absolute left-4 top-4 font-bold text-lg">✕</button>
@@ -735,7 +735,6 @@
                 enterApp();
             } else {
                 errorDiv.innerText = 'رقم الموبايل أو كلمة المرور غير صحيحة!';
-                errorDiv.classList.add('hidden'); // تصحيح الخطأ ليعرض الخطأ بوضوح
                 errorDiv.classList.remove('hidden');
             }
         }
@@ -882,7 +881,6 @@
             document.getElementById('chatRoomTitleBadge').innerText = current.name;
         }
 
-        // --- مكتبة الروحيات والعظات ---
         function getLibraryData() {
             let items = JSON.parse(localStorage.getItem('church_library_items'));
             if (!items || items.length === 0) {
@@ -961,7 +959,6 @@
 
         function closeLibraryViewer() { document.getElementById('libraryViewerModal').classList.add('hidden'); }
 
-        // --- إدارة القداسات (محدثة للإضافة والتعديل) ---
         function getMassesData() {
             let masses = JSON.parse(localStorage.getItem('church_masses_schedule'));
             if (!masses || masses.length === 0) {
@@ -1027,7 +1024,7 @@
             }
         }
 
-        // --- لوحة مسؤول المرحلة المخصصة ---
+        // --- إدارة مخدومي المرحلة والموافقة على الطلبات ---
         function openStageManagerModal() {
             renderStageManagerData();
             document.getElementById('stageManagerModal').classList.remove('hidden');
@@ -1040,9 +1037,9 @@
             document.getElementById('stageManagerTitle').innerText = `👥 إدارة مرحلة: ${stageName}`;
 
             let requests = JSON.parse(localStorage.getItem('church_pending_requests') || '[]');
-            let myPending = requests.filter(r => r.generalStage === stageName || r.generalStageId === stageName);
+            let myPending = requests.filter(r => r.generalStage === stageName || r.generalStageId === stageName || currentLoggedInUser.adminRole === 'super_admin');
             const pendingContainer = document.getElementById('stagePendingContainer');
-            pendingContainer.innerHTML = myPending.length === 0 ? `<p class="text-center opacity-60 text-xs py-1">لا توجد طلبات معلقة لمرحلتك.</p>` : '';
+            pendingContainer.innerHTML = myPending.length === 0 ? `<p class="text-center opacity-60 text-xs py-1">لا توجد طلبات معلقة.</p>` : '';
             
             myPending.forEach((req) => {
                 let globalIndex = requests.findIndex(r => r.phone === req.phone);
@@ -1051,15 +1048,15 @@
                         <p class="font-bold text-amber-500">${req.name} (${req.subGrade || req.generalStage})</p>
                         <p class="text-[10px]">📞 ${req.phone} | الميلاد: ${req.dob || '-'}</p>
                         <div class="flex gap-2 mt-2">
-                            <button onclick="approveRequest(${globalIndex}); renderStageManagerData();" class="flex-1 bg-green-600 text-white py-1 rounded text-[10px] font-bold">موافقة</button>
-                            <button onclick="rejectRequest(${globalIndex}); renderStageManagerData();" class="flex-1 bg-red-600 text-white py-1 rounded text-[10px] font-bold">رفض</button>
+                            <button onclick="approveRequest(${globalIndex}); renderStageManagerData();" class="flex-1 bg-green-600 text-white py-1 rounded text-[10px] font-bold">موافقة ✓</button>
+                            <button onclick="rejectRequest(${globalIndex}); renderStageManagerData();" class="flex-1 bg-red-600 text-white py-1 rounded text-[10px] font-bold">رفض ✕</button>
                         </div>
                     </div>
                 `;
             });
 
             let servants = JSON.parse(localStorage.getItem('church_all_servants') || '[]');
-            let myServants = servants.filter(s => s.generalStage === stageName || s.generalStageId === stageName);
+            let myServants = servants.filter(s => s.generalStage === stageName || s.generalStageId === stageName || currentLoggedInUser.adminRole === 'super_admin');
             const servantsContainer = document.getElementById('stageServantsContainer');
             servantsContainer.innerHTML = myServants.length === 0 ? `<p class="text-center opacity-60 text-xs py-1">لا يوجد مخدومين مسجلين في مرحلتك بعد.</p>` : '';
             
@@ -1074,7 +1071,6 @@
             });
         }
 
-        // --- الشات والمجموعات ---
         function getAllChatsData() { return JSON.parse(localStorage.getItem('church_stages_chats') || '{}'); }
 
         function renderChatMessages() {
@@ -1130,6 +1126,12 @@
             e.target.value = ''; 
         }
 
+        function openLightBox(imgSrc) {
+            document.getElementById('lightBoxImg').src = imgSrc;
+            document.getElementById('imageLightBoxModal').classList.remove('hidden');
+        }
+        function closeLightBox() { document.getElementById('imageLightBoxModal').classList.add('hidden'); }
+
         function saveAndPushMessage(msgObj) {
             let chats = getAllChatsData();
             if(!chats[currentSelectedStageId]) chats[currentSelectedStageId] = [];
@@ -1137,12 +1139,6 @@
             localStorage.setItem('church_stages_chats', JSON.stringify(chats));
             renderChatMessages();
         }
-
-        function openLightBox(imgSrc) {
-            document.getElementById('lightBoxImg').src = imgSrc;
-            document.getElementById('imageLightBoxModal').classList.remove('hidden');
-        }
-        function closeLightBox() { document.getElementById('imageLightBoxModal').classList.add('hidden'); }
 
         function getPollsData() {
             return JSON.parse(localStorage.getItem('church_stage_polls')) || [
@@ -1257,7 +1253,7 @@
                 schoolBox.classList.remove('hidden'); uniBox.classList.add('hidden');
                 let grades = general === 'ابتدائي' ? ['أولى ابتدائي', 'ثانية ابتدائي', 'ثالثة ابتدائي', 'رابعة ابتدائي', 'خامسة ابتدائي', 'سادسة ابتدائي'] : (general === 'إعدادي' ? ['أولى إعدادي', 'تانية إعدادي', 'ثالثة إعدادي'] : ['أولى ثانوي', 'تانية ثانوي', 'ثالثة ثانوي']);
                 grades.forEach(g => schoolSelect.innerHTML += `<option class="text-black" value="${g}">${g}</option>`);
-            } else if (general === 'جامعة') { schoolBox.classList.add('hidden'); uniBox.classList.remove('hidden'); }
+            } else if (general === 'جامعة وخرجين') { schoolBox.classList.add('hidden'); uniBox.classList.remove('hidden'); }
             else { schoolBox.classList.add('hidden'); uniBox.classList.add('hidden'); }
         }
 
@@ -1295,8 +1291,8 @@
                         <p class="font-bold text-amber-500">${req.name} (${req.generalStage})</p>
                         <p class="text-[10px]">📞 ${req.phone} | عيد الميلاد: ${req.dob || '-'}</p>
                         <div class="flex gap-2 mt-2">
-                            <button onclick="approveRequest(${index}); renderPendingRequests(); renderServantsList();" class="flex-1 bg-green-600 text-white py-1 rounded text-[10px] font-bold">موافقة</button>
-                            <button onclick="rejectRequest(${index}); renderPendingRequests();" class="flex-1 bg-red-600 text-white py-1 rounded text-[10px] font-bold">رفض</button>
+                            <button onclick="approveRequest(${index}); renderPendingRequests(); renderServantsList();" class="flex-1 bg-green-600 text-white py-1 rounded text-[10px] font-bold">موافقة ✓</button>
+                            <button onclick="rejectRequest(${index}); renderPendingRequests();" class="flex-1 bg-red-600 text-white py-1 rounded text-[10px] font-bold">رفض ✕</button>
                         </div>
                     </div>`;
             });
@@ -1309,12 +1305,14 @@
             servants.push(accepted);
             localStorage.setItem('church_pending_requests', JSON.stringify(requests));
             localStorage.setItem('church_all_servants', JSON.stringify(servants));
+            alert('تمت الموافقة على انضمام المخدوم بنجاح!');
         }
 
         function rejectRequest(index) {
             let requests = JSON.parse(localStorage.getItem('church_pending_requests') || '[]');
             requests.splice(index, 1);
             localStorage.setItem('church_pending_requests', JSON.stringify(requests));
+            alert('تم رفض الطلب.');
         }
 
         function renderServantsList() {
