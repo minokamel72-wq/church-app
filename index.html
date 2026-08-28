@@ -6,7 +6,6 @@
     <title>كنيسة السيدة العذراء مريم والشهيد أبانوب بالواسطي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <!-- استدعاء مكتبة Firebase للربط السحابي والمزامنة الفورية -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
@@ -15,26 +14,19 @@
         .gold-accent { color: #d4af37; }
         .gold-bg { background-color: #d4af37; }
         .gold-border { border-color: #d4af37; }
-        
         body.light-mode { background-color: #f4f6f9; color: #1f2937; }
         body.light-mode .app-container { background-color: #ffffff; color: #1f2937; }
         body.light-mode .card-bg { background-color: #f9fafb; color: #1f2937; border-color: #e5e7eb; }
-        
-        body.dark-mode { background-color: #111827; color: #f3f4f6; }
-        body.dark-mode .app-container { background-color: #1f2937; color: #f3f4f6; }
-        body.dark-mode .card-bg { background-color: #374151; color: #f3f4f6; border-color: #4b5563; }
-        
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .splash-anim { animation: fadeIn 0.8s ease-out forwards; }
     </style>
 </head>
 <body class="light-mode min-h-screen flex flex-col items-center justify-start p-0 m-0">
 
-    <!-- شاشة البداية (Splash Screen) -->
     <div id="splashScreen" class="fixed inset-0 royal-blue z-50 flex flex-col items-center justify-center p-4 text-center">
         <div class="splash-anim flex flex-col items-center">
             <div class="w-28 h-28 rounded-full border-4 border-amber-400 overflow-hidden shadow-2xl bg-white mb-4 flex items-center justify-center p-1">
-                <img id="splashIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
+                <img src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
             </div>
             <h1 class="text-xs font-bold gold-accent tracking-wider">إيبارشية بني سويف للأقباط الأرثوذكس</h1>
             <h2 class="text-base font-black text-white mt-1 mb-6">كنيسة السيدة العذراء والشهيد أبانوب بالواسطي</h2>
@@ -42,18 +34,16 @@
         </div>
     </div>
 
-    <!-- شاشة تسجيل الدخول (Auth Gate) -->
     <div id="authGateScreen" class="fixed inset-0 royal-blue z-40 flex items-center justify-center p-4 overflow-y-auto hidden">
         <div class="app-container w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border-2 gold-border text-center">
             <div class="w-20 h-20 rounded-full border-2 border-amber-400 overflow-hidden shadow-md bg-white mx-auto mb-3 flex items-center justify-center p-0.5">
-                <img id="gateIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
+                <img src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
             </div>
             <h1 class="text-xs font-bold gold-accent">إيبارشية بني سويف للأقباط الأرثوذكس</h1>
             <h2 class="text-sm font-black text-white mt-1 mb-4">كنيسة السيدة العذراء مريم والشهيد أبانوب بالواسطي</h2>
             
             <div id="authOptionsView" class="space-y-3">
                 <p class="text-xs text-gray-300 mb-4">يرجى اختيار نوع تسجيل الدخول للمتابعة:</p>
-                
                 <button onclick="showServantLogin()" class="w-full gold-bg hover:bg-amber-600 text-gray-950 font-bold py-3 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
                     <span>👤 دخول المخدومين والأعضاء</span>
                 </button>
@@ -70,13 +60,11 @@
                 </div>
             </div>
 
-            <!-- نموذج تسجيل دخول مخدوم -->
             <div id="servantLoginForm" class="hidden space-y-3 text-right">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-xs font-bold gold-accent">👤 تسجيل دخول مخدوم</h3>
                     <button onclick="backToAuthOptions()" class="text-[10px] text-gray-400 hover:text-white">رجوع ↩</button>
                 </div>
-                <p class="text-[11px] text-gray-300">أدخل رقم الموبايل المسجل به في الكنيسة:</p>
                 <div>
                     <label class="block text-xs font-bold mb-1">رقم الموبايل:</label>
                     <input type="tel" id="loginServantPhone" required placeholder="01xxxxxxxx0" class="w-full p-2.5 border rounded-xl text-xs outline-none bg-transparent">
@@ -87,7 +75,6 @@
                 <div id="servantLoginError" class="hidden p-2 bg-red-500/20 text-red-400 text-[11px] text-center rounded-xl font-bold"></div>
             </div>
 
-            <!-- نموذج تسجيل دخول مسؤول -->
             <div id="adminLoginForm" class="hidden space-y-3 text-right">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-xs font-bold gold-accent">⚙️ تسجيل دخول مسؤول / إداري</h3>
@@ -113,7 +100,6 @@
         </div>
     </div>
 
-    <!-- لوحة عرض الطلبات الرئيسية للمسؤول والشامل (تظهر تلقائياً بعد الدخول) -->
     <div id="mainDashboard" class="w-full max-w-4xl p-4 hidden">
         <header class="flex justify-between items-center mb-6 card-bg p-4 rounded-2xl shadow border">
             <div>
@@ -123,7 +109,6 @@
             <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-2 rounded-xl">تسجيل الخروج</button>
         </header>
 
-        <!-- قسم إضافة طلب جديد (خاص بالمخدوم) -->
         <div id="servantSection" class="hidden card-bg p-4 rounded-2xl shadow border mb-6">
             <h3 class="text-sm font-bold mb-3 gold-accent">📝 إرسال طلب جديد للكنيسة</h3>
             <div class="space-y-3">
@@ -133,16 +118,12 @@
             </div>
         </div>
 
-        <!-- قسم متابعة الطلبات (مشترك للمسؤول والشامل والمخدوم) -->
         <div class="card-bg p-4 rounded-2xl shadow border">
             <h3 class="text-sm font-bold mb-4 gold-accent">📋 سجل الطلبات الحية (مزامنة فورية)</h3>
-            <div id="requestsContainer" class="space-y-3">
-                <!-- يتم تعبئة الطلبات تلقائياً من القاعدة السحابية -->
-            </div>
+            <div id="requestsContainer" class="space-y-3"></div>
         </div>
     </div>
 
-    <!-- نوافذ التسجيل الجديدة (المخدوم والمسؤول) -->
     <div id="newServantModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
         <div class="app-container w-full max-w-sm rounded-3xl p-6 shadow-2xl border-2 gold-border text-right space-y-3">
             <h3 class="text-xs font-bold gold-accent">📝 تسجيل حساب مخدوم جديد</h3>
@@ -186,9 +167,8 @@
     </div>
 
     <script>
-        // إعدادات اتصال قاعدة بيانات Firebase السحابية المشتركة للتحديث التلقائي
         const firebaseConfig = {
-            databaseURL: "https://abanob-church-default-rtdb.firebaseio.com/" // قاعدة بيانات سحابية مجانية تدعم المزامنة الفورية
+            databaseURL: "https://abanob-church-default-rtdb.firebaseio.com/"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -203,7 +183,7 @@
                 } else {
                     document.getElementById('authGateScreen').classList.remove('hidden');
                 }
-            }, 1200);
+            }, 800);
         });
 
         function showServantLogin() {
@@ -229,7 +209,6 @@
             document.getElementById('adminRegisterModal').classList.add('hidden');
         }
 
-        // تسجيل مخدوم جديد وحفظه سحابياً
         function registerNewServant() {
             const name = document.getElementById('regServantName').value.trim();
             const phone = document.getElementById('regServantPhone').value.trim();
@@ -244,7 +223,6 @@
             });
         }
 
-        // تسجيل مسؤول جديد وحفظه سحابياً
         function registerNewAdmin() {
             const name = document.getElementById('regAdminName').value.trim();
             const phone = document.getElementById('regAdminPhone').value.trim();
@@ -261,9 +239,9 @@
             });
         }
 
-        // التحقق من دخول المخدوم
         function verifyServantLogin() {
             const phone = document.getElementById('loginServantPhone').value.trim();
+            if(!phone) return alert('أدخل رقم الموبايل');
             db.ref('servants/' + phone).once('value').then((snapshot) => {
                 const user = snapshot.val();
                 if(user) {
@@ -271,16 +249,18 @@
                     localStorage.setItem('church_current_user', JSON.stringify(currentUser));
                     showDashboard();
                 } else {
-                    document.getElementById('servantLoginError').innerText = 'رقم الموبايل غير مسجل! سجل حساباً جديداً أولاً.';
+                    document.getElementById('servantLoginError').innerText = 'رقم الموبايل غير مسجل كـ مخدوم!';
                     document.getElementById('servantLoginError').classList.remove('hidden');
                 }
+            }).catch(err => {
+                alert('خطأ في الاتصال بالشبكة أو قاعدة البيانات');
             });
         }
 
-        // التحقق من دخول المسؤول
         function verifyAdminLogin() {
             const phone = document.getElementById('loginAdminPhone').value.trim();
             const pass = document.getElementById('loginAdminPass').value.trim();
+            if(!phone || !pass) return alert('أدخل البيانات كاملة');
             db.ref('admins/' + phone).once('value').then((snapshot) => {
                 const admin = snapshot.val();
                 if(admin && admin.pass === pass) {
@@ -288,9 +268,11 @@
                     localStorage.setItem('church_current_user', JSON.stringify(currentUser));
                     showDashboard();
                 } else {
-                    document.getElementById('adminLoginError').innerText = 'بيانات الدخول غير صحيحة أو كلمة المرور خطأ.';
+                    document.getElementById('adminLoginError').innerText = 'رقم الموبايل أو كلمة المرور غير صحيحة.';
                     document.getElementById('adminLoginError').classList.remove('hidden');
                 }
+            }).catch(err => {
+                alert('خطأ في الاتصال بالشبكة أو قاعدة البيانات');
             });
         }
 
@@ -302,11 +284,9 @@
             if(currentUser.type === 'servant') {
                 document.getElementById('servantSection').classList.remove('hidden');
             }
-            // جلب ومزامنة الطلبات لحظياً
             listenToRequests();
         }
 
-        // إرسال طلب جديد سحابياً
         function submitNewRequest() {
             const title = document.getElementById('reqTitle').value.trim();
             const desc = document.getElementById('reqDesc').value.trim();
@@ -326,14 +306,13 @@
 
             db.ref('requests/' + reqId).set(newReq, (error) => {
                 if(!error) {
-                    alert('تم إرسال الطلب بنجاح وسيظهر فوراً للمسؤولين!');
+                    alert('تم إرسال الطلب بنجاح وسيظهر للمسؤولين فوراً!');
                     document.getElementById('reqTitle').value = '';
                     document.getElementById('reqDesc').value = '';
                 }
             });
         }
 
-        // الاستماع الفعلي للطلبات ومزامنتها تلقائياً لدى الجميع
         function listenToRequests() {
             const container = document.getElementById('requestsContainer');
             db.ref('requests').on('value', (snapshot) => {
@@ -345,7 +324,7 @@
                 }
 
                 Object.values(data).forEach(req => {
-                    // صلاحية الفرز: المسؤول الشامل يرى الكل، مسؤول المرحلة يرى طلبات مرحلته فقط، والمخدوم يرى طلباته فقط
+                    // المسؤول الشامل يرى كل الطلبات، مسؤول المرحلة يرى طلبات مرحلته، والمخدوم يرى طلباته الخاصة فقط
                     if(currentUser.type === 'admin' && currentUser.role === 'stage_admin' && currentUser.stage !== req.stage) return;
                     if(currentUser.type === 'servant' && currentUser.phone !== req.servantPhone) return;
 
@@ -375,13 +354,8 @@
             });
         }
 
-        // تحديث حالة الطلب (موافقة أو رفض) وتحديثه فوراً عند الجميع
         function updateReqStatus(reqId, newStatus) {
-            db.ref('requests/' + reqId).update({ status: newStatus }, (error) => {
-                if(!error) {
-                    // التحديث يتم سحابياً ولحظياً في شاشة المخدوم والمسؤول الشامل دون إعادة تحميل
-                }
-            });
+            db.ref('requests/' + reqId).update({ status: newStatus });
         }
 
         function logout() {
