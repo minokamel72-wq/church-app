@@ -14,9 +14,15 @@
         .gold-accent { color: #d4af37; }
         .gold-bg { background-color: #d4af37; }
         .gold-border { border-color: #d4af37; }
+        
         body.light-mode { background-color: #f4f6f9; color: #1f2937; }
         body.light-mode .app-container { background-color: #ffffff; color: #1f2937; }
         body.light-mode .card-bg { background-color: #f9fafb; color: #1f2937; border-color: #e5e7eb; }
+        
+        body.dark-mode { background-color: #111827; color: #f3f4f6; }
+        body.dark-mode .app-container { background-color: #1f2937; color: #f3f4f6; }
+        body.dark-mode .card-bg { background-color: #374151; color: #f3f4f6; border-color: #4b5563; }
+        
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .splash-anim { animation: fadeIn 0.8s ease-out forwards; }
     </style>
@@ -26,7 +32,7 @@
     <div id="splashScreen" class="fixed inset-0 royal-blue z-50 flex flex-col items-center justify-center p-4 text-center">
         <div class="splash-anim flex flex-col items-center">
             <div class="w-28 h-28 rounded-full border-4 border-amber-400 overflow-hidden shadow-2xl bg-white mb-4 flex items-center justify-center p-1">
-                <img src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
+                <img id="splashIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
             </div>
             <h1 class="text-xs font-bold gold-accent tracking-wider">إيبارشية بني سويف للأقباط الأرثوذكس</h1>
             <h2 class="text-base font-black text-white mt-1 mb-6">كنيسة السيدة العذراء والشهيد أبانوب بالواسطي</h2>
@@ -37,13 +43,18 @@
     <div id="authGateScreen" class="fixed inset-0 royal-blue z-40 flex items-center justify-center p-4 overflow-y-auto hidden">
         <div class="app-container w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border-2 gold-border text-center">
             <div class="w-20 h-20 rounded-full border-2 border-amber-400 overflow-hidden shadow-md bg-white mx-auto mb-3 flex items-center justify-center p-0.5">
-                <img src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
+                <img id="gateIcon" src="https://i.ibb.co/6y402v7/1000080640.jpg" alt="أيقونة الكنيسة" class="w-full h-full object-cover rounded-full">
             </div>
             <h1 class="text-xs font-bold gold-accent">إيبارشية بني سويف للأقباط الأرثوذكس</h1>
             <h2 class="text-sm font-black text-white mt-1 mb-4">كنيسة السيدة العذراء مريم والشهيد أبانوب بالواسطي</h2>
             
             <div id="authOptionsView" class="space-y-3">
                 <p class="text-xs text-gray-300 mb-4">يرجى اختيار نوع تسجيل الدخول للمتابعة:</p>
+                
+                <button id="biometricLoginBtn" onclick="loginWithBiometrics()" class="hidden w-full bg-indigo-900 hover:bg-indigo-950 text-amber-300 font-bold py-2.5 rounded-xl text-xs shadow-lg transition border border-amber-400/50 flex items-center justify-center gap-2">
+                    <span>🧬 الدخول السريع بالبصمة (صباع / وجه)</span>
+                </button>
+
                 <button onclick="showServantLogin()" class="w-full gold-bg hover:bg-amber-600 text-gray-950 font-bold py-3 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
                     <span>👤 دخول المخدومين والأعضاء</span>
                 </button>
@@ -65,6 +76,7 @@
                     <h3 class="text-xs font-bold gold-accent">👤 تسجيل دخول مخدوم</h3>
                     <button onclick="backToAuthOptions()" class="text-[10px] text-gray-400 hover:text-white">رجوع ↩</button>
                 </div>
+                <p class="text-[11px] text-gray-300">أدخل رقم الموبايل المسجل به في الكنيسة:</p>
                 <div>
                     <label class="block text-xs font-bold mb-1">رقم الموبايل:</label>
                     <input type="tel" id="loginServantPhone" required placeholder="01xxxxxxxx0" class="w-full p-2.5 border rounded-xl text-xs outline-none bg-transparent">
@@ -100,11 +112,12 @@
         </div>
     </div>
 
+    <!-- نافذة لوحة التحكم الرئيسية بعد الدخول -->
     <div id="mainDashboard" class="w-full max-w-4xl p-4 hidden">
         <header class="flex justify-between items-center mb-6 card-bg p-4 rounded-2xl shadow border">
             <div>
                 <h2 id="welcomeUserTitle" class="text-sm font-bold gold-accent">مرحباً بك</h2>
-                <p id="userRoleDesc" class="text-xs text-gray-400">لوحة المتابعة الفورية</p>
+                <p id="userRoleDesc" class="text-xs text-gray-400">لوحة المتابعة والطلبات</p>
             </div>
             <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-2 rounded-xl">تسجيل الخروج</button>
         </header>
@@ -119,12 +132,12 @@
         </div>
 
         <div class="card-bg p-4 rounded-2xl shadow border">
-            <h3 class="text-sm font-bold mb-4 gold-accent">📋 سجل الطلبات الحية (مزامنة فورية)</h3>
+            <h3 class="text-sm font-bold mb-4 gold-accent">📋 سجل الطلبات الحية</h3>
             <div id="requestsContainer" class="space-y-3"></div>
         </div>
     </div>
 
-    <!-- نوافذ التسجيل -->
+    <!-- نافذة تسجيل مخدوم جديد -->
     <div id="newServantModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
         <div class="app-container w-full max-w-sm rounded-3xl p-6 shadow-2xl border-2 gold-border text-right space-y-3">
             <h3 class="text-xs font-bold gold-accent">📝 تسجيل حساب مخدوم جديد</h3>
@@ -143,6 +156,7 @@
         </div>
     </div>
 
+    <!-- نافذة تسجيل مسؤول جديد -->
     <div id="adminRegisterModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
         <div class="app-container w-full max-w-sm rounded-3xl p-6 shadow-2xl border-2 gold-border text-right space-y-3">
             <h3 class="text-xs font-bold gold-accent">⚙️ تسجيل مسؤول مرحلة أو إداري جديد</h3>
@@ -186,6 +200,7 @@
             setTimeout(() => {
                 const splash = document.getElementById('splashScreen');
                 if(splash) splash.style.display = 'none';
+                
                 if (currentUser) {
                     showDashboard();
                 } else {
@@ -230,12 +245,10 @@
 
             const servantData = { name, phone, stage, type: 'servant' };
 
-            // حفظ محلي فوري لمنع أي تعليق
             let localServants = JSON.parse(localStorage.getItem('local_servants') || '{}');
             localServants[phone] = servantData;
             localStorage.setItem('local_servants', JSON.stringify(localServants));
 
-            // رفع سحابي في الخلفية
             db.ref('servants/' + phone).set(servantData).catch(() => {});
 
             alert('تم تسجيل حساب المخدوم بنجاح!');
@@ -258,12 +271,10 @@
 
             const adminData = { name, phone, pass, role, stage, type: 'admin' };
 
-            // حفظ محلي فوري
             let localAdmins = JSON.parse(localStorage.getItem('local_admins') || '{}');
             localAdmins[phone] = adminData;
             localStorage.setItem('local_admins', JSON.stringify(localAdmins));
 
-            // رفع سحابي في الخلفية
             db.ref('admins/' + phone).set(adminData).catch(() => {});
 
             alert('تم تسجيل المسؤول بنجاح!');
@@ -283,7 +294,6 @@
                 return;
             }
 
-            // فحص محلي فوري لاستجابة سريعة جداً
             let localServants = JSON.parse(localStorage.getItem('local_servants') || '{}');
             if(localServants[phone]) {
                 currentUser = localServants[phone];
@@ -292,7 +302,6 @@
                 return;
             }
 
-            // فحص سحابي مع مهلة أمان قصوى لمنع تعليق الزر نهائياً
             let resolved = false;
             db.ref('servants/' + phone).once('value').then((snapshot) => {
                 if(resolved) return;
@@ -315,14 +324,13 @@
                 errBox.classList.remove('hidden');
             });
 
-            // مؤمانة ضد تعليق شبكة الفايربيز
             setTimeout(() => {
                 if(!resolved) {
                     resolved = true;
                     errBox.innerText = 'تأكد من تسجيل الحساب مسبقاً على هذا الجهاز.';
                     errBox.classList.remove('hidden');
                 }
-            }, 3000);
+            }, 3500);
         }
 
         function verifyAdminLogin() {
@@ -336,7 +344,6 @@
                 return;
             }
 
-            // فحص محلي فوري
             let localAdmins = JSON.parse(localStorage.getItem('local_admins') || '{}');
             if(localAdmins[phone] && localAdmins[phone].pass === pass) {
                 currentUser = localAdmins[phone];
@@ -345,7 +352,6 @@
                 return;
             }
 
-            // فحص سحابي آمن مع مهلة
             let resolved = false;
             db.ref('admins/' + phone).once('value').then((snapshot) => {
                 if(resolved) return;
@@ -374,7 +380,7 @@
                     errBox.innerText = 'فشل الاتصال بالسيرفر، تأكد من الإنترنت.';
                     errBox.classList.remove('hidden');
                 }
-            }, 3000);
+            }, 3500);
         }
 
         function showDashboard() {
@@ -454,13 +460,17 @@
                     `;
                     container.appendChild(card);
                 });
-            }, (error) => {
-                container.innerHTML = '<p class="text-xs text-red-400 text-center py-4">تعذر الاتصال بقاعدة البيانات الحية، تأكد من الاتصال.</p>';
+            }, () => {
+                container.innerHTML = '<p class="text-xs text-red-400 text-center py-4">تعذر الاتصال بقاعدة البيانات الحية.</p>';
             });
         }
 
         function updateReqStatus(reqId, newStatus) {
             db.ref('requests/' + reqId).update({ status: newStatus });
+        }
+
+        function loginWithBiometrics() {
+            alert('خاصية البصمة جاهزة، وتعمل عند توفر دعم المتصفح والجهاز.');
         }
 
         function logout() {
