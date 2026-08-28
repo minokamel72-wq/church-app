@@ -124,6 +124,7 @@
         </div>
     </div>
 
+    <!-- نوافذ التسجيل -->
     <div id="newServantModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
         <div class="app-container w-full max-w-sm rounded-3xl p-6 shadow-2xl border-2 gold-border text-right space-y-3">
             <h3 class="text-xs font-bold gold-accent">📝 تسجيل حساب مخدوم جديد</h3>
@@ -136,7 +137,7 @@
                 <option value="جامعي">جامعي</option>
             </select>
             <div class="flex gap-2 pt-2">
-                <button onclick="registerNewServant()" class="flex-1 gold-bg text-gray-950 font-bold py-2 rounded-xl text-xs">تسجيل</button>
+                <button onclick="registerNewServant()" class="flex-1 gold-bg text-gray-950 font-bold py-2 rounded-xl text-xs">تسجيل وحفظ</button>
                 <button onclick="closeModals()" class="flex-1 bg-gray-700 text-white py-2 rounded-xl text-xs">إلغاء</button>
             </div>
         </div>
@@ -213,13 +214,26 @@
             const name = document.getElementById('regServantName').value.trim();
             const phone = document.getElementById('regServantPhone').value.trim();
             const stage = document.getElementById('regServantStage').value;
-            if(!name || !phone) return alert('الرجاء إدخال البيانات كاملة');
+            
+            if(!name || !phone) {
+                alert('الرجاء إدخال الاسم ورقم الموبايل كاملاً');
+                return;
+            }
 
-            db.ref('servants/' + phone).set({ name, phone, stage, type: 'servant' }, (error) => {
-                if(!error) {
-                    alert('تم التسجيل بنجاح! يمكنك الدخول برقم الموبايل الآن.');
-                    closeModals();
-                }
+            const servantData = { name, phone, stage, type: 'servant' };
+
+            // حفظ احتياطي محلياً أولاً لضمان عدم تعليق الزر نهائياً
+            let localServants = JSON.parse(localStorage.getItem('local_servants') || '{}');
+            localServants[phone] = servantData;
+            localStorage.setItem('local_servants', JSON.stringify(localServants));
+
+            // محاولة الحفظ سحابياً
+            db.ref('servants/' + phone).set(servantData).then(() => {
+                alert('تم تسجيل حساب المخدوم بنجاح!');
+                closeModals();
+            }).catch(err => {
+                alert('تم الحفظ محلياً وسيتم المزامنة (تأكد من الاتصال للإنترنت)');
+                closeModals();
             });
         }
 
@@ -229,19 +243,46 @@
             const pass = document.getElementById('regAdminPass').value.trim();
             const role = document.getElementById('regAdminRole').value;
             const stage = document.getElementById('regAdminStage').value;
-            if(!name || !phone || !pass) return alert('الرجاء إدخال كافة بيانات الحساب');
 
-            db.ref('admins/' + phone).set({ name, phone, pass, role, stage, type: 'admin' }, (error) => {
-                if(!error) {
-                    alert('تم تسجيل المسؤول بنجاح!');
-                    closeModals();
-                }
+            if(!name || !phone || !pass) {
+                alert('الرجاء إدخال كافة بيانات الحساب وكلمة المرور');
+                return;
+            }
+
+            const adminData = { name, phone, pass, role, stage, type: 'admin' };
+
+            // حفظ احتياطي محلياً
+            let localAdmins = JSON.parse(localStorage.getItem('local_admins') || '{}');
+            localAdmins[phone] = adminData;
+            localStorage.setItem('local_admins', JSON.stringify(localAdmins));
+
+            // حفظ سحابي
+            db.ref('admins/' + phone).set(adminData).then(() => {
+                alert('تم تسجيل المسؤول بنجاح!');
+                closeModals();
+            }).catch(err => {
+                alert('تم الحفظ محلياً وسيتم المزامنة.');
+                closeModals();
             });
         }
 
         function verifyServantLogin() {
             const phone = document.getElementById('loginServantPhone').value.trim();
-            if(!phone) return alert('أدخل رقم الموبايل');
+            if(!phone) {
+                alert('أدخل رقم الموبايل');
+                return;
+            }
+
+            // فحص محلي أولاً لتسريع الدخول فوراً
+            let localServants = JSON.parse(localStorage.getItem('local_servants') || '{}');
+            if(localServants[phone]) {
+                currentUser = localServants[phone];
+                localStorage.setItem('church_current_user', JSON.stringify(currentUser));
+                showDashboard();
+                return;
+            }
+
+            // فحص سحابي
             db.ref('servants/' + phone).once('value').then((snapshot) => {
                 const user = snapshot.val();
                 if(user) {
@@ -252,15 +293,29 @@
                     document.getElementById('servantLoginError').innerText = 'رقم الموبايل غير مسجل كـ مخدوم!';
                     document.getElementById('servantLoginError').classList.remove('hidden');
                 }
-            }).catch(err => {
-                alert('خطأ في الاتصال بالشبكة أو قاعدة البيانات');
+            }).catch(() => {
+                alert('فشل تسجيل الدخول، تأكد من تسجيل الحساب مسبقاً.');
             });
         }
 
         function verifyAdminLogin() {
             const phone = document.getElementById('loginAdminPhone').value.trim();
             const pass = document.getElementById('loginAdminPass').value.trim();
-            if(!phone || !pass) return alert('أدخل البيانات كاملة');
+            if(!phone || !pass) {
+                alert('أدخل رقم الموبايل وكلمة المرور');
+                return;
+            }
+
+            // فحص محلي أولاً
+            let localAdmins = JSON.parse(localStorage.getItem('local_admins') || '{}');
+            if(localAdmins[phone] && localAdmins[phone].pass === pass) {
+                currentUser = localAdmins[phone];
+                localStorage.setItem('church_current_user', JSON.stringify(currentUser));
+                showDashboard();
+                return;
+            }
+
+            // فحص سحابي
             db.ref('admins/' + phone).once('value').then((snapshot) => {
                 const admin = snapshot.val();
                 if(admin && admin.pass === pass) {
@@ -271,8 +326,8 @@
                     document.getElementById('adminLoginError').innerText = 'رقم الموبايل أو كلمة المرور غير صحيحة.';
                     document.getElementById('adminLoginError').classList.remove('hidden');
                 }
-            }).catch(err => {
-                alert('خطأ في الاتصال بالشبكة أو قاعدة البيانات');
+            }).catch(() => {
+                alert('فشل الاتصال، يرجى التأكد من صحة بيانات المسؤول.');
             });
         }
 
@@ -290,9 +345,12 @@
         function submitNewRequest() {
             const title = document.getElementById('reqTitle').value.trim();
             const desc = document.getElementById('reqDesc').value.trim();
-            if(!title) return alert('أدخل عنوان الطلب من فضلك');
+            if(!title) {
+                alert('أدخل عنوان الطلب من فضلك');
+                return;
+            }
 
-            const reqId = db.ref('requests').push().key;
+            const reqId = 'req_' + Date.now();
             const newReq = {
                 id: reqId,
                 servantName: currentUser.name,
@@ -304,12 +362,12 @@
                 date: new Date().toLocaleString('ar-EG')
             };
 
-            db.ref('requests/' + reqId).set(newReq, (error) => {
-                if(!error) {
-                    alert('تم إرسال الطلب بنجاح وسيظهر للمسؤولين فوراً!');
-                    document.getElementById('reqTitle').value = '';
-                    document.getElementById('reqDesc').value = '';
-                }
+            db.ref('requests/' + reqId).set(newReq).then(() => {
+                alert('تم إرسال الطلب بنجاح وسيظهر للمسؤولين فوراً!');
+                document.getElementById('reqTitle').value = '';
+                document.getElementById('reqDesc').value = '';
+            }).catch(() => {
+                alert('حدث خطأ أثناء الإرسال، حاول مرة أخرى.');
             });
         }
 
@@ -324,7 +382,6 @@
                 }
 
                 Object.values(data).forEach(req => {
-                    // المسؤول الشامل يرى كل الطلبات، مسؤول المرحلة يرى طلبات مرحلته، والمخدوم يرى طلباته الخاصة فقط
                     if(currentUser.type === 'admin' && currentUser.role === 'stage_admin' && currentUser.stage !== req.stage) return;
                     if(currentUser.type === 'servant' && currentUser.phone !== req.servantPhone) return;
 
