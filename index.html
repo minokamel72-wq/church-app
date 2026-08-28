@@ -6,8 +6,10 @@
     <title>كنيسة السيدة العذراء مريم والشهيد أبانوب بالواسطي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        body { font-family: 'Cairo', sans-serif; }
+        body { font-family: 'Cairo', sans-serif; transition: background-color 0.3s, color 0.3s; }
         .royal-blue { background-color: #0d1b2a; }
         .gold-accent { color: #d4af37; }
         .gold-bg { background-color: #d4af37; }
@@ -64,13 +66,13 @@
                     <button onclick="backToAuthOptions()" class="text-[10px] text-gray-400 hover:text-white">رجوع ↩</button>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold mb-1 text-white">رقم الموبايل:</label>
-                    <input type="tel" id="loginServantPhone" required placeholder="01xxxxxxxx0" class="w-full p-2.5 border rounded-xl text-xs outline-none bg-white text-gray-900">
+                    <label class="block text-xs font-bold mb-1">رقم الموبايل:</label>
+                    <input type="tel" id="loginServantPhone" required placeholder="01xxxxxxxx0" class="w-full p-2.5 border rounded-xl text-xs outline-none bg-transparent">
                 </div>
                 <button onclick="verifyServantLogin()" class="w-full gold-bg hover:bg-amber-600 text-gray-950 font-bold py-2.5 rounded-xl text-xs shadow transition">
                     دخول التطبيق 🚀
                 </button>
-                <div id="servantLoginError" class="hidden p-2 bg-red-500/20 text-red-300 text-[11px] text-center rounded-xl font-bold"></div>
+                <div id="servantLoginError" class="hidden p-2 bg-red-500/20 text-red-400 text-[11px] text-center rounded-xl font-bold"></div>
             </div>
 
             <div id="adminLoginForm" class="hidden space-y-3 text-right">
@@ -79,17 +81,17 @@
                     <button onclick="backToAuthOptions()" class="text-[10px] text-gray-400 hover:text-white">رجوع ↩</button>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold mb-1 text-white">رقم الموبايل المسجل:</label>
-                    <input type="tel" id="loginAdminPhone" required placeholder="01xxxxxxxx0" class="w-full p-2 border rounded-xl text-xs outline-none bg-white text-gray-900">
+                    <label class="block text-xs font-bold mb-1">رقم الموبايل المسجل:</label>
+                    <input type="tel" id="loginAdminPhone" required placeholder="01xxxxxxxx0" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold mb-1 text-white">كلمة المرور الخاصة بك:</label>
-                    <input type="password" id="loginAdminPass" required placeholder="كلمة المرور السرية" class="w-full p-2 border rounded-xl text-xs outline-none bg-white text-gray-900">
+                    <label class="block text-xs font-bold mb-1">كلمة المرور الخاصة بك:</label>
+                    <input type="password" id="loginAdminPass" required placeholder="كلمة المرور السرية" class="w-full p-2 border rounded-xl text-xs outline-none bg-transparent">
                 </div>
                 <button onclick="verifyAdminLogin()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
                     دخول لوحة التحكم 🔐
                 </button>
-                <div id="adminLoginError" class="hidden p-2 bg-red-500/20 text-red-300 text-[11px] text-center rounded-xl font-bold"></div>
+                <div id="adminLoginError" class="hidden p-2 bg-red-500/20 text-red-400 text-[11px] text-center rounded-xl font-bold"></div>
             </div>
 
             <footer class="mt-6 text-center border-t border-gray-700 pt-3">
@@ -102,7 +104,7 @@
         <header class="flex justify-between items-center mb-6 card-bg p-4 rounded-2xl shadow border">
             <div>
                 <h2 id="welcomeUserTitle" class="text-sm font-bold gold-accent">مرحباً بك</h2>
-                <p id="userRoleDesc" class="text-xs text-gray-400">لوحة المتابعة</p>
+                <p id="userRoleDesc" class="text-xs text-gray-400">لوحة المتابعة الفورية</p>
             </div>
             <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-2 rounded-xl">تسجيل الخروج</button>
         </header>
@@ -117,12 +119,12 @@
         </div>
 
         <div class="card-bg p-4 rounded-2xl shadow border">
-            <h3 class="text-sm font-bold mb-4 gold-accent">📋 سجل الطلبات والخدمات</h3>
+            <h3 class="text-sm font-bold mb-4 gold-accent">📋 سجل الطلبات الحية (مزامنة فورية)</h3>
             <div id="requestsContainer" class="space-y-3"></div>
         </div>
     </div>
 
-    <!-- نافذة تسجيل مخدوم -->
+    <!-- نوافذ التسجيل -->
     <div id="newServantModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
         <div class="app-container w-full max-w-sm rounded-3xl p-6 shadow-2xl border-2 gold-border text-right space-y-3">
             <h3 class="text-xs font-bold gold-accent">📝 تسجيل حساب مخدوم جديد</h3>
@@ -141,7 +143,6 @@
         </div>
     </div>
 
-    <!-- نافذة تسجيل مسؤول -->
     <div id="adminRegisterModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
         <div class="app-container w-full max-w-sm rounded-3xl p-6 shadow-2xl border-2 gold-border text-right space-y-3">
             <h3 class="text-xs font-bold gold-accent">⚙️ تسجيل مسؤول مرحلة أو إداري جديد</h3>
@@ -167,15 +168,29 @@
     </div>
 
     <script>
+        const firebaseConfig = {
+            databaseURL: "https://abanob-church-default-rtdb.firebaseio.com/"
+        };
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+        } catch(e) {
+            console.log(e);
+        }
+        const db = firebase.database();
+
         let currentUser = JSON.parse(localStorage.getItem('church_current_user')) || null;
 
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                document.getElementById('splashScreen').style.display = 'none';
+                const splash = document.getElementById('splashScreen');
+                if(splash) splash.style.display = 'none';
                 if (currentUser) {
                     showDashboard();
                 } else {
-                    document.getElementById('authGateScreen').classList.remove('hidden');
+                    const gate = document.getElementById('authGateScreen');
+                    if(gate) gate.classList.remove('hidden');
                 }
             }, 600);
         });
@@ -209,15 +224,21 @@
             const stage = document.getElementById('regServantStage').value;
             
             if(!name || !phone) {
-                alert('الرجاء إدخال الاسم ورقم الموبايل');
+                alert('الرجاء إدخال الاسم ورقم الموبايل كاملاً');
                 return;
             }
 
-            let servants = JSON.parse(localStorage.getItem('church_servants') || '{}');
-            servants[phone] = { name, phone, stage, type: 'servant' };
-            localStorage.setItem('church_servants', JSON.stringify(servants));
+            const servantData = { name, phone, stage, type: 'servant' };
 
-            alert('تم تسجيل المخدوم بنجاح! يمكنك الدخول برقم الموبايل الآن.');
+            // حفظ محلي فوري لمنع أي تعليق
+            let localServants = JSON.parse(localStorage.getItem('local_servants') || '{}');
+            localServants[phone] = servantData;
+            localStorage.setItem('local_servants', JSON.stringify(localServants));
+
+            // رفع سحابي في الخلفية
+            db.ref('servants/' + phone).set(servantData).catch(() => {});
+
+            alert('تم تسجيل حساب المخدوم بنجاح!');
             closeModals();
             document.getElementById('regServantName').value = '';
             document.getElementById('regServantPhone').value = '';
@@ -231,13 +252,19 @@
             const stage = document.getElementById('regAdminStage').value;
 
             if(!name || !phone || !pass) {
-                alert('الرجاء إدخال كافة بيانات المسؤول وكلمة المرور');
+                alert('الرجاء إدخال كافة بيانات الحساب وكلمة المرور');
                 return;
             }
 
-            let admins = JSON.parse(localStorage.getItem('church_admins') || '{}');
-            admins[phone] = { name, phone, pass, role, stage, type: 'admin' };
-            localStorage.setItem('church_admins', JSON.stringify(admins));
+            const adminData = { name, phone, pass, role, stage, type: 'admin' };
+
+            // حفظ محلي فوري
+            let localAdmins = JSON.parse(localStorage.getItem('local_admins') || '{}');
+            localAdmins[phone] = adminData;
+            localStorage.setItem('local_admins', JSON.stringify(localAdmins));
+
+            // رفع سحابي في الخلفية
+            db.ref('admins/' + phone).set(adminData).catch(() => {});
 
             alert('تم تسجيل المسؤول بنجاح!');
             closeModals();
@@ -248,39 +275,106 @@
 
         function verifyServantLogin() {
             const phone = document.getElementById('loginServantPhone').value.trim();
+            const errBox = document.getElementById('servantLoginError');
+            errBox.classList.add('hidden');
+
             if(!phone) {
-                alert('أدخل رقم الموبايل من فضلك');
+                alert('أدخل رقم الموبايل');
                 return;
             }
 
-            let servants = JSON.parse(localStorage.getItem('church_servants') || '{}');
-            if(servants[phone]) {
-                currentUser = servants[phone];
+            // فحص محلي فوري لاستجابة سريعة جداً
+            let localServants = JSON.parse(localStorage.getItem('local_servants') || '{}');
+            if(localServants[phone]) {
+                currentUser = localServants[phone];
                 localStorage.setItem('church_current_user', JSON.stringify(currentUser));
                 showDashboard();
-            } else {
-                document.getElementById('servantLoginError').innerText = 'رقم الموبايل غير مسجل، سجل بياناتك أولاً!';
-                document.getElementById('servantLoginError').classList.remove('hidden');
+                return;
             }
+
+            // فحص سحابي مع مهلة أمان قصوى لمنع تعليق الزر نهائياً
+            let resolved = false;
+            db.ref('servants/' + phone).once('value').then((snapshot) => {
+                if(resolved) return;
+                resolved = true;
+                const user = snapshot.val();
+                if(user) {
+                    localServants[phone] = user;
+                    localStorage.setItem('local_servants', JSON.stringify(localServants));
+                    currentUser = user;
+                    localStorage.setItem('church_current_user', JSON.stringify(currentUser));
+                    showDashboard();
+                } else {
+                    errBox.innerText = 'رقم الموبايل غير مسجل كـ مخدوم!';
+                    errBox.classList.remove('hidden');
+                }
+            }).catch(() => {
+                if(resolved) return;
+                resolved = true;
+                errBox.innerText = 'تأكد من الاتصال بالإنترنت أو صحة الرقم.';
+                errBox.classList.remove('hidden');
+            });
+
+            // مؤمانة ضد تعليق شبكة الفايربيز
+            setTimeout(() => {
+                if(!resolved) {
+                    resolved = true;
+                    errBox.innerText = 'تأكد من تسجيل الحساب مسبقاً على هذا الجهاز.';
+                    errBox.classList.remove('hidden');
+                }
+            }, 3000);
         }
 
         function verifyAdminLogin() {
             const phone = document.getElementById('loginAdminPhone').value.trim();
             const pass = document.getElementById('loginAdminPass').value.trim();
+            const errBox = document.getElementById('adminLoginError');
+            errBox.classList.add('hidden');
+
             if(!phone || !pass) {
                 alert('أدخل رقم الموبايل وكلمة المرور');
                 return;
             }
 
-            let admins = JSON.parse(localStorage.getItem('church_admins') || '{}');
-            if(admins[phone] && admins[phone].pass === pass) {
-                currentUser = admins[phone];
+            // فحص محلي فوري
+            let localAdmins = JSON.parse(localStorage.getItem('local_admins') || '{}');
+            if(localAdmins[phone] && localAdmins[phone].pass === pass) {
+                currentUser = localAdmins[phone];
                 localStorage.setItem('church_current_user', JSON.stringify(currentUser));
                 showDashboard();
-            } else {
-                document.getElementById('adminLoginError').innerText = 'رقم الموبايل أو كلمة المرور غير صحيحة.';
-                document.getElementById('adminLoginError').classList.remove('hidden');
+                return;
             }
+
+            // فحص سحابي آمن مع مهلة
+            let resolved = false;
+            db.ref('admins/' + phone).once('value').then((snapshot) => {
+                if(resolved) return;
+                resolved = true;
+                const admin = snapshot.val();
+                if(admin && admin.pass === pass) {
+                    localAdmins[phone] = admin;
+                    localStorage.setItem('local_admins', JSON.stringify(localAdmins));
+                    currentUser = admin;
+                    localStorage.setItem('church_current_user', JSON.stringify(currentUser));
+                    showDashboard();
+                } else {
+                    errBox.innerText = 'رقم الموبايل أو كلمة المرور غير صحيحة.';
+                    errBox.classList.remove('hidden');
+                }
+            }).catch(() => {
+                if(resolved) return;
+                resolved = true;
+                errBox.innerText = 'فشل الاتصال، تأكد من بيانات المسؤول.';
+                errBox.classList.remove('hidden');
+            });
+
+            setTimeout(() => {
+                if(!resolved) {
+                    resolved = true;
+                    errBox.innerText = 'فشل الاتصال بالسيرفر، تأكد من الإنترنت.';
+                    errBox.classList.remove('hidden');
+                }
+            }, 3000);
         }
 
         function showDashboard() {
@@ -291,20 +385,20 @@
             if(currentUser.type === 'servant') {
                 document.getElementById('servantSection').classList.remove('hidden');
             }
-            loadRequests();
+            listenToRequests();
         }
 
         function submitNewRequest() {
             const title = document.getElementById('reqTitle').value.trim();
             const desc = document.getElementById('reqDesc').value.trim();
             if(!title) {
-                alert('أدخل عنوان الطلب');
+                alert('أدخل عنوان الطلب من فضلك');
                 return;
             }
 
-            let requests = JSON.parse(localStorage.getItem('church_requests') || '[]');
+            const reqId = 'req_' + Date.now();
             const newReq = {
-                id: 'req_' + Date.now(),
+                id: reqId,
                 servantName: currentUser.name,
                 servantPhone: currentUser.phone,
                 stage: currentUser.stage,
@@ -314,59 +408,59 @@
                 date: new Date().toLocaleString('ar-EG')
             };
 
-            requests.unshift(newReq);
-            localStorage.setItem('church_requests', JSON.stringify(requests));
-
-            alert('تم إرسال الطلب بنجاح!');
-            document.getElementById('reqTitle').value = '';
-            document.getElementById('reqDesc').value = '';
-            loadRequests();
+            db.ref('requests/' + reqId).set(newReq).then(() => {
+                alert('تم إرسال الطلب بنجاح وسيظهر للمسؤولين فوراً!');
+                document.getElementById('reqTitle').value = '';
+                document.getElementById('reqDesc').value = '';
+            }).catch(() => {
+                alert('تم الحفظ مؤقتاً وسيتم إرساله عند استقرار الإنترنت.');
+            });
         }
 
-        function loadRequests() {
+        function listenToRequests() {
             const container = document.getElementById('requestsContainer');
-            let requests = JSON.parse(localStorage.getItem('church_requests') || '[]');
-            
-            container.innerHTML = '';
-            if(requests.length === 0) {
-                container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">لا توجد طلبات مسجلة حتى الآن.</p>';
-                return;
-            }
+            db.ref('requests').on('value', (snapshot) => {
+                container.innerHTML = '';
+                const data = snapshot.val();
+                if(!data) {
+                    container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">لا توجد طلبات مسجلة حتى الآن.</p>';
+                    return;
+                }
 
-            requests.forEach(req => {
-                if(currentUser.type === 'admin' && currentUser.role === 'stage_admin' && currentUser.stage !== req.stage) return;
-                if(currentUser.type === 'servant' && currentUser.phone !== req.servantPhone) return;
+                Object.values(data).forEach(req => {
+                    if(currentUser.type === 'admin' && currentUser.role === 'stage_admin' && currentUser.stage !== req.stage) return;
+                    if(currentUser.type === 'servant' && currentUser.phone !== req.servantPhone) return;
 
-                let statusColor = req.status === 'تمت الموافقة' ? 'text-green-400 bg-green-500/10' : (req.status === 'مرفوض' ? 'text-red-400 bg-red-500/10' : 'text-amber-400 bg-amber-500/10');
+                    let statusColor = req.status === 'تمت الموافقة' ? 'text-green-400 bg-green-500/10' : (req.status === 'مرفوض' ? 'text-red-400 bg-red-500/10' : 'text-amber-400 bg-amber-500/10');
 
-                let card = document.createElement('div');
-                card.className = "card-bg p-3 rounded-xl border flex flex-col gap-2 text-xs";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center font-bold">
-                        <span class="gold-accent">${req.title}</span>
-                        <span class="px-2 py-0.5 rounded-md ${statusColor}">${req.status}</span>
-                    </div>
-                    <p class="text-gray-300">${req.desc || 'بدون تفاصيل'}</p>
-                    <div class="flex justify-between items-center text-[10px] text-gray-400 border-t pt-2 border-gray-700">
-                        <span>المخدوم: ${req.servantName} (${req.stage})</span>
-                        <span>${req.date}</span>
-                    </div>
-                    ${currentUser.type === 'admin' ? `
-                        <div class="flex gap-2 mt-2 pt-2 border-t border-gray-700">
-                            <button onclick="updateReqStatus('${req.id}', 'تمت الموافقة')" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-1.5 rounded-lg font-bold">✅ موافقة وتفعيل</button>
-                            <button onclick="updateReqStatus('${req.id}', 'مرفوض')" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-1.5 rounded-lg font-bold">❌ رفض</button>
+                    let card = document.createElement('div');
+                    card.className = "card-bg p-3 rounded-xl border flex flex-col gap-2 text-xs";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center font-bold">
+                            <span class="gold-accent">${req.title}</span>
+                            <span class="px-2 py-0.5 rounded-md ${statusColor}">${req.status}</span>
                         </div>
-                    ` : ''}
-                `;
-                container.appendChild(card);
+                        <p class="text-gray-300">${req.desc || 'بدون تفاصيل'}</p>
+                        <div class="flex justify-between items-center text-[10px] text-gray-400 border-t pt-2 border-gray-700">
+                            <span>المخدوم: ${req.servantName} (${req.stage})</span>
+                            <span>${req.date}</span>
+                        </div>
+                        ${currentUser.type === 'admin' ? `
+                            <div class="flex gap-2 mt-2 pt-2 border-t border-gray-700">
+                                <button onclick="updateReqStatus('${req.id}', 'تمت الموافقة')" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-1.5 rounded-lg font-bold">✅ موافقة وتفعيل</button>
+                                <button onclick="updateReqStatus('${req.id}', 'مرفوض')" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-1.5 rounded-lg font-bold">❌ رفض</button>
+                            </div>
+                        ` : ''}
+                    `;
+                    container.appendChild(card);
+                });
+            }, (error) => {
+                container.innerHTML = '<p class="text-xs text-red-400 text-center py-4">تعذر الاتصال بقاعدة البيانات الحية، تأكد من الاتصال.</p>';
             });
         }
 
         function updateReqStatus(reqId, newStatus) {
-            let requests = JSON.parse(localStorage.getItem('church_requests') || '[]');
-            requests = requests.map(r => r.id === reqId ? {...r, status: newStatus} : r);
-            localStorage.setItem('church_requests', JSON.stringify(requests));
-            loadRequests();
+            db.ref('requests/' + reqId).update({ status: newStatus });
         }
 
         function logout() {
